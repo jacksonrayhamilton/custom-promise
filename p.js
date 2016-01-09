@@ -1,146 +1,165 @@
-/*jshint browser: true, globalstrict: true */
-/*global setImmediate */
+/*global setTimeout */
 
-'use strict';
+/*jshint -W098 */
+var p = (function () {
+  /*jshint +W098 */
 
-var task =
-  typeof setImmediate === 'function' ? setImmediate :
-  setTimeout;
+  'use strict';
 
-function isObject(value) {
-  return value && typeof value === 'object';
-}
-
-function isFunction(value) {
-  return typeof value === 'function';
-}
-
-function resolutionProcedure(promise, x, resolve, reject) {
-  if (promise === x) {
-    throw new TypeError('then() cannot return same Promise that it resolves');
+  function isObject(value) {
+    return value && typeof value === 'object';
   }
-  if (isObject(x) || isFunction(x)) {
-    var then;
-    try {
-      then = x.then;
-    } catch (e) {
-      reject(e);
-      return;
+
+  function isFunction(value) {
+    return typeof value === 'function';
+  }
+
+  function resolutionProcedure(promise, x, resolve, reject) {
+    if (promise === x) {
+      throw new TypeError('then() cannot return same Promise that it resolves');
     }
-    if (isFunction(then)) {
-      var called = false;
+    if (isObject(x) || isFunction(x)) {
+      var then;
       try {
-        then.call(x, function resolvePromise(y) {
-          if (called) {
-            return;
-          }
-          called = true;
-          resolutionProcedure(promise, y, resolve, reject);
-        }, function rejectPromise(r) {
-          if (called) {
-            return;
-          }
-          called = true;
-          reject(r);
-        });
+        then = x.then;
       } catch (e) {
-        if (!called) {
-          reject(e);
-          return;
+        reject(e);
+        return;
+      }
+      if (isFunction(then)) {
+        var called = false;
+        try {
+          then.call(x, function (y) {
+            if (called) {
+              return;
+            }
+            called = true;
+            resolutionProcedure(promise, y, resolve, reject);
+          }, function (r) {
+            if (called) {
+              return;
+            }
+            called = true;
+            reject(r);
+          });
+        } catch (e) {
+          if (!called) {
+            reject(e);
+            return;
+          }
         }
+      } else {
+        resolve(x);
       }
     } else {
       resolve(x);
     }
-  } else {
-    resolve(x);
   }
-}
 
-function p(executor) {
-  var instance = {};
-  if (!isFunction(executor)) {
-    throw new TypeError('Argument 1 must be a function');
-  }
-  var state;
-  var value;
-  var reason;
-  var fulfilleds;
-  var rejecteds;
-  var resolvers;
-  var rejectors;
-  var promises;
-  function empty() {
-    fulfilleds = [];
-    rejecteds = [];
-    resolvers = [];
-    rejectors = [];
-    promises = [];
-  }
-  empty();
-  function resolve(_value) {
-    state = 'resolved';
-    value = _value;
-    fulfilleds.forEach(function (onFulfilled, index) {
-      var promise = promises[index];
-      var resolver = resolvers[index];
-      var rejector = rejectors[index];
-      task(function () {
-        try {
-          var x = isFunction(onFulfilled) ? onFulfilled(value) : value;
-          resolutionProcedure(promise, x, resolver, rejector);
-        } catch (e) {
-          rejector(e);
-        }
-      });
-    });
-    empty();
-  }
-  function reject(_reason) {
-    state = 'rejected';
-    reason = _reason;
-    rejecteds.forEach(function (onRejected, index) {
-      var promise = promises[index];
-      var resolver = resolvers[index];
-      var rejector = rejectors[index];
-      task(function () {
-        try {
-          if (isFunction(onRejected)) {
-            var x = onRejected(reason);
-            resolutionProcedure(promise, x, resolver, rejector);
-          } else {
-            rejector(reason);
+  var FULFILLED = {};
+  var REJECTED = {};
+
+  function defer() {
+    var state;
+    var value;
+    var reason;
+    var onFulfilleds;
+    var onRejecteds;
+    var resolves;
+    var rejects;
+    var promises;
+    function empty() {
+      onFulfilleds = [];
+      onRejecteds = [];
+      resolves = [];
+      rejects = [];
+      promises = [];
+    }
+    function callOnFulfilleds() {
+      onFulfilleds.forEach(function (onFulfilled, index) {
+        var promise = promises[index];
+        var resolve = resolves[index];
+        var reject = rejects[index];
+        setTimeout(function () {
+          try {
+            var x = isFunction(onFulfilled) ? onFulfilled(value) : value;
+            resolutionProcedure(promise, x, resolve, reject);
+          } catch (e) {
+            reject(e);
           }
-        } catch (e) {
-          rejector(e);
-        }
+        });
       });
-    });
+      empty();
+    }
+    function resolve(_value) {
+      if (state) {
+        return;
+      }
+      state = FULFILLED;
+      value = _value;
+      callOnFulfilleds();
+    }
+    function callOnRejecteds() {
+      onRejecteds.forEach(function (onRejected, index) {
+        var promise = promises[index];
+        var resolve = resolves[index];
+        var reject = rejects[index];
+        setTimeout(function () {
+          try {
+            if (isFunction(onRejected)) {
+              var x = onRejected(reason);
+              resolutionProcedure(promise, x, resolve, reject);
+            } else {
+              reject(reason);
+            }
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+      empty();
+    }
+    function reject(_reason) {
+      if (state) {
+        return;
+      }
+      state = REJECTED;
+      reason = _reason;
+      callOnRejecteds();
+    }
+    function promiseThen(onFulfilled, onRejected) {
+      onFulfilleds.push(onFulfilled);
+      onRejecteds.push(onRejected);
+      var deferred = defer();
+      promises.push(deferred.promise);
+      resolves.push(deferred.resolve);
+      rejects.push(deferred.reject);
+      if (state === FULFILLED) {
+        callOnFulfilleds();
+      }
+      if (state === REJECTED) {
+        callOnRejecteds();
+      }
+      return deferred.promise;
+    }
+    function promiseCatch(onRejected) {
+      return promiseThen(void 0, onRejected);
+    }
     empty();
+    var promise = {
+      then: promiseThen,
+      catch: promiseCatch
+    };
+    var deferred = {
+      promise: promise,
+      resolve: resolve,
+      reject: reject
+    };
+    return deferred;
   }
-  try {
-    executor(resolve, reject);
-  } catch (e) {
-    reject(e);
-  }
-  instance.then = function (onFulfilled, onRejected) {
-    fulfilleds.push(onFulfilled);
-    rejecteds.push(onRejected);
-    var thenPromise = p(function (resolve, reject) {
-      resolvers.push(resolve);
-      rejectors.push(reject);
-    });
-    promises.push(thenPromise);
-    if (state === 'resolved') {
-      resolve(value);
-    }
-    if (state === 'rejected') {
-      reject(reason);
-    }
-    return thenPromise;
+
+  return {
+    defer: defer
   };
-  instance.catch = function (onRejected) {
-    return instance.then(undefined, onRejected);
-  };
-  return instance;
-}
+
+}());

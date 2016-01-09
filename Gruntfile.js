@@ -9,13 +9,6 @@ module.exports = function (grunt) {
       options: {
         footer: 'module.exports = p;'
       }
-    },
-    {
-      name: 'browser',
-      options: {
-        banner: 'var p = (function () {',
-        footer: 'return p; }());'
-      }
     }
   ];
   config.concat = {
