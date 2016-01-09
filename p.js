@@ -52,31 +52,19 @@ var p = (function () {
   function defer() {
     var state;
     var valueOrReason;
-    var onFulfilleds;
-    var onRejecteds;
-    var promises;
-    var resolves;
-    var rejects;
-    function empty() {
-      onFulfilleds = [];
-      onRejecteds = [];
-      promises = [];
-      resolves = [];
-      rejects = [];
-    }
-    empty();
-    function iterateCallbacks(callbacks, iteratee) {
-      for (var i = 0; i < callbacks.length; i += 1) {
+    var pending = [];
+    function iteratePending(offset, iteratee) {
+      var p;
+      while ((p = pending.shift())) {
         (function (callback, promise, resolve, reject) {
           task(function () {
             iteratee(callback, promise, resolve, reject);
           });
-        }(callbacks[i], promises[i], resolves[i], rejects[i]));
+        }(p[offset], p[2], p[3], p[4]));
       }
-      empty();
     }
     function callOnFulfilleds() {
-      iterateCallbacks(onFulfilleds, function (onFulfilled, promise, resolve, reject) {
+      iteratePending(0, function (onFulfilled, promise, resolve, reject) {
         try {
           var x = isFunction(onFulfilled) ? onFulfilled(valueOrReason) : valueOrReason;
           resolutionProcedure(promise, x, resolve, reject);
@@ -86,7 +74,7 @@ var p = (function () {
       });
     }
     function callOnRejecteds() {
-      iterateCallbacks(onRejecteds, function (onRejected, promise, resolve, reject) {
+      iteratePending(1, function (onRejected, promise, resolve, reject) {
         try {
           if (isFunction(onRejected)) {
             var x = onRejected(valueOrReason);
@@ -102,12 +90,14 @@ var p = (function () {
     return {
       promise: {
         then: function (onFulfilled, onRejected) {
-          onFulfilleds.push(onFulfilled);
-          onRejecteds.push(onRejected);
           var deferred = defer();
-          promises.push(deferred.promise);
-          resolves.push(deferred.resolve);
-          rejects.push(deferred.reject);
+          pending.push([
+            onFulfilled,
+            onRejected,
+            deferred.promise,
+            deferred.resolve,
+            deferred.reject
+          ]);
           if (state === FULFILLED) {
             callOnFulfilleds();
           }
