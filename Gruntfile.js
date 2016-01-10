@@ -25,6 +25,11 @@ module.exports = function (grunt) {
       dest: 'build/p.' + name + '.js'
     };
   });
+  config.mochaTest = {
+    all: {
+      src: ['tests.js']
+    }
+  };
   config.watch = {
     build: {
       files: ['p.js'],
@@ -40,7 +45,8 @@ module.exports = function (grunt) {
   grunt.registerTask('test:promises-aplus', function () {
     require('promises-aplus-tests')(require('./adapter'), this.async());
   });
+  grunt.registerTask('test:extensions', ['mochaTest']);
   grunt.registerTask('build', ['concat']);
   grunt.registerTask('serve', ['build', 'watch']);
-  grunt.registerTask('test', ['jshint', 'test:promises-aplus']);
+  grunt.registerTask('test', ['jshint', 'test:promises-aplus', 'test:extensions']);
 };
