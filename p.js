@@ -18,9 +18,6 @@ var p = (function () {
     return typeof value === 'function';
   }
 
-  var FULFILLED = 1;
-  var REJECTED = 2;
-
   function defer() {
     var resolvedOrRejected;
     var state;
@@ -33,7 +30,7 @@ var p = (function () {
       }
     }
     function rejectInner(reason) {
-      state = REJECTED;
+      state = 2;
       valueOrReason = reason;
       callCallbacks();
     }
@@ -66,7 +63,7 @@ var p = (function () {
             rejectInner(reason);
           });
         } else {
-          state = FULFILLED;
+          state = 1;
           valueOrReason = value;
           callCallbacks();
         }
