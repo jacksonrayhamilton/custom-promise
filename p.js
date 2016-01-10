@@ -52,20 +52,20 @@ var p = (function () {
   function defer() {
     var state;
     var valueOrReason;
-    var pending = [];
-    function iteratePending(offset, iteratee) {
+    var queue = [];
+    function emptyQueue(offset, iteratee) {
       /*jshint loopfunc: true */
-      var p;
-      while ((p = pending.shift())) {
+      var item;
+      while ((item = queue.shift())) {
         (function (callback, promise, resolve, reject) {
           task(function () {
             iteratee(callback, promise, resolve, reject);
           });
-        }(p[offset], p[2], p[3], p[4]));
+        }(item[offset], item[2], item[3], item[4]));
       }
     }
     function callOnFulfilleds() {
-      iteratePending(0, function (onFulfilled, promise, resolve, reject) {
+      emptyQueue(0, function (onFulfilled, promise, resolve, reject) {
         try {
           var x = isFunction(onFulfilled) ? onFulfilled(valueOrReason) : valueOrReason;
           resolutionProcedure(promise, x, resolve, reject);
@@ -75,7 +75,7 @@ var p = (function () {
       });
     }
     function callOnRejecteds() {
-      iteratePending(1, function (onRejected, promise, resolve, reject) {
+      emptyQueue(1, function (onRejected, promise, resolve, reject) {
         try {
           if (isFunction(onRejected)) {
             var x = onRejected(valueOrReason);
@@ -90,7 +90,7 @@ var p = (function () {
     }
     function promiseThen(onFulfilled, onRejected) {
       var deferred = defer();
-      pending.push([
+      queue.push([
         onFulfilled,
         onRejected,
         deferred.promise,
