@@ -2,8 +2,8 @@
 
 A small and secure A+ promise library.
 
-It only implements A+; absolutely nothing more. Minified and gzipped it is less
-than 450 bytes.
+Besides A+, promises have a `catch` method, and there are `resolve` and `reject`
+functions. Minified and gzipped the library is less than 500 bytes.
 
 ```js
 var deferred = p.defer();
@@ -14,7 +14,7 @@ if (Math.random() < 0.5) {
 }
 deferred.promise.then(function (value) {
   console.log(value);
-}, function (reason) {
+}).catch(function (reason) {
   console.error(reason);
 });
 ```

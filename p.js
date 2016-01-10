@@ -87,25 +87,30 @@ var p = (function () {
         }
       });
     }
+    function promiseThen(onFulfilled, onRejected) {
+      var deferred = defer();
+      pending.push([
+        onFulfilled,
+        onRejected,
+        deferred.promise,
+        deferred.resolve,
+        deferred.reject
+      ]);
+      if (state === FULFILLED) {
+        callOnFulfilleds();
+      }
+      if (state === REJECTED) {
+        callOnRejecteds();
+      }
+      return deferred.promise;
+    }
+    function promiseCatch(onRejected) {
+      return promiseThen(0, onRejected);
+    }
     return {
       promise: {
-        then: function (onFulfilled, onRejected) {
-          var deferred = defer();
-          pending.push([
-            onFulfilled,
-            onRejected,
-            deferred.promise,
-            deferred.resolve,
-            deferred.reject
-          ]);
-          if (state === FULFILLED) {
-            callOnFulfilleds();
-          }
-          if (state === REJECTED) {
-            callOnRejecteds();
-          }
-          return deferred.promise;
-        }
+        then: promiseThen,
+        'catch': promiseCatch // Quotes for old IE
       },
       resolve: function (value) {
         if (state) {
@@ -127,7 +132,17 @@ var p = (function () {
   }
 
   return {
-    defer: defer
+    defer: defer,
+    resolve: function (value) {
+      var deferred = defer();
+      deferred.resolve(value);
+      return deferred.promise;
+    },
+    reject: function (reason) {
+      var deferred = defer();
+      deferred.reject(reason);
+      return deferred.promise;
+    }
   };
 
 }());
