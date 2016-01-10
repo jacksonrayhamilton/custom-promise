@@ -146,43 +146,31 @@ var p = (function () {
       deferred.reject(reason);
       return deferred.promise;
     },
-    all: function (array) {
-      /*jshint loopfunc: true */
+    all: function (collection) {
+      var array = {}.toString.call(collection) === '[object Array]';
       var deferred = defer();
-      var resolvedValues = [];
+      var resolvedValues = array ? [] : {};
       var resolvedCount = 0;
-      var length = array.length;
-      for (var i = 0; i < length; i += 1) {
-        (function (i) {
-          resolve(array[i]).then(function (value) {
-            resolvedValues[i] = value;
-            resolvedCount += 1;
-            if (resolvedCount === length) {
-              deferred.resolve(resolvedValues);
-            }
-          }, deferred.reject);
-        }(i));
+      var length = array ? collection.length : 0;
+      function iteratee(key) {
+        resolve(collection[key]).then(function (value) {
+          resolvedValues[key] = value;
+          resolvedCount += 1;
+          if (resolvedCount === length) {
+            deferred.resolve(resolvedValues);
+          }
+        }, deferred.reject);
       }
-      return deferred.promise;
-    },
-    props: function (object) {
-      /*jshint loopfunc: true */
-      var deferred = defer();
-      var resolvedValues = {};
-      var resolvedCount = 0;
-      var length = 0;
-      for (var key in object) {
-        if ({}.hasOwnProperty.call(object, key)) {
-          length += 1;
-          (function (key) {
-            resolve(object[key]).then(function (value) {
-              resolvedValues[key] = value;
-              resolvedCount += 1;
-              if (resolvedCount === length) {
-                deferred.resolve(resolvedValues);
-              }
-            }, deferred.reject);
-          }(key));
+      if (array) {
+        for (var i = 0; i < length; i += 1) {
+          iteratee(i);
+        }
+      } else {
+        for (var key in collection) {
+          if ({}.hasOwnProperty.call(collection, key)) {
+            length += 1;
+            iteratee(key);
+          }
         }
       }
       return deferred.promise;
