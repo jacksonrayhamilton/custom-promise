@@ -1,9 +1,8 @@
 /*jshint strict: false */
 /*global setTimeout */
+/*exported p */
 
-/*jshint -W098 */
 var p = (function () {
-  /*jshint +W098 */
 
   var task = setTimeout;
 
