@@ -6,6 +6,18 @@ var assert = require('better-assert');
 var isEqual = require('lodash/lang/isEqual');
 var p = require('./build/p.commonjs.js');
 
+describe('Promises/A+ Tests', function () {
+
+  var adapter = {
+    deferred: p.defer,
+    resolved: p.resolve,
+    rejected: p.reject
+  };
+
+  require('promises-aplus-tests').mocha(adapter);
+
+});
+
 describe('p.all', function () {
 
   describe('resolution', function () {

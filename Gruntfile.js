@@ -42,11 +42,7 @@ module.exports = function (grunt) {
     }
   };
   grunt.initConfig(config);
-  grunt.registerTask('test:promises-aplus', function () {
-    require('promises-aplus-tests')(require('./adapter'), this.async());
-  });
-  grunt.registerTask('test:extensions', ['mochaTest']);
   grunt.registerTask('build', ['concat']);
   grunt.registerTask('serve', ['build', 'watch']);
-  grunt.registerTask('test', ['jshint', 'test:promises-aplus', 'test:extensions']);
+  grunt.registerTask('test', ['jshint', 'mochaTest']);
 };
