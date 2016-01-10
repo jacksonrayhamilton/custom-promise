@@ -2,7 +2,7 @@
 
 A small, useful and secure A+ promise library.
 
-- Small: About 650 bytes minified and gzipped.
+- Small: About 600 bytes minified and gzipped.
 - Useful: A+ compliance, `catch`, `resolve`, `reject`, `all`, old IE support.
 - Secure: No private state exposed.
 
@@ -13,7 +13,7 @@ A small, useful and secure A+ promise library.
 Create a deferred object with these properties:
 
 - `promise`: A promise.
-- `resolve`, `reject`: Methods to resolve or reject the promise.
+- `resolve`, `reject`: Methods to fulfill or reject the promise.
 
 ### `promise.then(onFulfilled, onRejected)`
 
@@ -26,7 +26,7 @@ Shortcut method for registering just a rejection callback.
 
 ### `p.resolve(value)`
 
-Create a promise resolving with `value`.  If `value` has a `then` method, it is
+Create a promise fulfilled with `value`.  If `value` has a `then` method, it is
 assumed to be a promise, and this function returns a promise inheriting the
 state of `value`.
 
@@ -37,9 +37,9 @@ Create a promise rejected with `reason`.
 ### `p.all(collection)`
 
 Create a promise resolving with values from `collection`.  Each value in
-`collection` must resolve with `p.resolve` before the promise resolves.  If any
-value in `collection` is rejected, the promise is rejected. `collection` can be
-an array or an object.
+`collection` must be fulfilled by `p.resolve` before the promise is fulfilled.
+If any value in `collection` is rejected, the promise is rejected. `collection`
+can be an array or an object.
 
 ## Examples
 

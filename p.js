@@ -19,52 +19,106 @@ var p = (function () {
   }
 
   function defer() {
-    var resolvedOrRejected;
+    // Flag to prevent multiple fulfillments or rejections.
+    var fulfilledOrRejected;
+
+    // Fulfilled state is 1, rejected is 2.
     var state;
+
+    // Final value of the promise.
     var valueOrReason;
+
+    // Pending handlers for `then`.
     var callbacks = [];
+
+    // Execute all pending handlers asynchronously.
     function callCallbacks() {
       var callback;
       while ((callback = callbacks.shift())) {
         task(callback);
       }
     }
+
+    // Access the current or eventual value or reason of `promise`.
+    function promiseThen(onFulfilled, onRejected) {
+      var deferred = defer();
+      // Detach these methods to guarantee a reference to them even after
+      // `deferred` is returned and potentially tampered-with.
+      var resolve = deferred.resolve;
+      var reject = deferred.reject;
+      callbacks.push(function () {
+        // Call the callback for the state of `promise`.
+        var callback = state < 2 ? onFulfilled : onRejected;
+        // A fulfillment value should be handled by `resolve`.  The return value
+        // of `onFulfilled` or `onRejected` should be handled by `resolve`.  An
+        // unhandled rejection reason should be passed to `reject`.
+        var resolveOrReject = (state < 2 || isFunction(callback)) ? resolve : reject;
+        try {
+          resolveOrReject(isFunction(callback) ? callback(valueOrReason) : valueOrReason);
+        } catch (e) {
+          reject(e);
+        }
+      });
+      if (state) {
+        // If `promise` is already fulfilled, call its callbacks presently.
+        callCallbacks();
+      }
+      return deferred.promise;
+    }
+
+    // Access the current or eventual reason of `promise`.
+    function promiseCatch(onRejected) {
+      return promiseThen(0, onRejected);
+    }
+
+    var promise = {
+      then: promiseThen,
+      'catch': promiseCatch // Quotes for old IE
+    };
+
+    // Reject, unguarded.
     function rejectInner(reason) {
       state = 2;
       valueOrReason = reason;
       callCallbacks();
     }
+
+    // Reject `promise` with `reason`.
     function reject(reason) {
-      if (resolvedOrRejected) {
+      if (fulfilledOrRejected) {
         return;
       }
       rejectInner(reason);
-      resolvedOrRejected = 1;
+      fulfilledOrRejected = 1;
     }
-    function resolveInner(value) {
-      if (promise === value) {
+
+    // Resolve, unguarded.  Implements the promise resolution procedure.
+    function resolveInner(x) {
+      if (promise === x) {
         throw TypeError();
       }
       var called;
       try {
         var then;
-        if ((isObject(value) || isFunction(value)) && isFunction(then = value.then)) {
-          then.call(value, function (value) {
+        if ((isObject(x) || isFunction(x)) && isFunction(then = x.then)) {
+          // Try to make `promise` adopt the state of `x`, a thenable.
+          then.call(x, function (y) {
             if (called) {
               return;
             }
             called = 1;
-            resolveInner(value);
-          }, function (reason) {
+            resolveInner(y);
+          }, function (r) {
             if (called) {
               return;
             }
             called = 1;
-            rejectInner(reason);
+            rejectInner(r);
           });
         } else {
+          // Fulfill `promise` with `x`, a non-thenable.
           state = 1;
-          valueOrReason = value;
+          valueOrReason = x;
           callCallbacks();
         }
       } catch (e) {
@@ -75,38 +129,16 @@ var p = (function () {
         rejectInner(e);
       }
     }
+
+    // Fulfill `promise` with `value`.
     function resolve(value) {
-      if (resolvedOrRejected) {
+      if (fulfilledOrRejected) {
         return;
       }
       resolveInner(value);
-      resolvedOrRejected = 1;
+      fulfilledOrRejected = 1;
     }
-    function promiseThen(onFulfilled, onRejected) {
-      var deferred = defer();
-      var resolve = deferred.resolve;
-      var reject = deferred.reject;
-      callbacks.push(function () {
-        var callback = state < 2 ? onFulfilled : onRejected;
-        var resolveOrReject = (state < 2 || isFunction(callback)) ? resolve : reject;
-        try {
-          resolveOrReject(isFunction(callback) ? callback(valueOrReason) : valueOrReason);
-        } catch (e) {
-          reject(e);
-        }
-      });
-      if (state) {
-        callCallbacks();
-      }
-      return deferred.promise;
-    }
-    function promiseCatch(onRejected) {
-      return promiseThen(0, onRejected);
-    }
-    var promise = {
-      then: promiseThen,
-      'catch': promiseCatch // Quotes for old IE
-    };
+
     return {
       promise: promise,
       resolve: resolve,
@@ -114,30 +146,34 @@ var p = (function () {
     };
   }
 
+  // Create a promise fulfilled with `value`.
   function resolve(value) {
     var deferred = defer();
     deferred.resolve(value);
     return deferred.promise;
   }
 
+  // Create a promise rejected with `reason`.
   function reject(reason) {
     var deferred = defer();
     deferred.reject(reason);
     return deferred.promise;
   }
 
+  // Create a promise fulfilled with the values of `collection` or rejected by
+  // one value of `collection`, where `collection` is an array or object.
   function all(collection) {
     var array = isArray(collection);
     var deferred = defer();
-    var resolvedValues = array ? [] : {};
-    var resolvedCount = 0;
+    var values = array ? [] : {};
+    var count = 0;
     var length = array ? collection.length : 0;
     function iteratee(key) {
       resolve(collection[key]).then(function (value) {
-        resolvedValues[key] = value;
-        resolvedCount += 1;
-        if (resolvedCount === length) {
-          deferred.resolve(resolvedValues);
+        values[key] = value;
+        count += 1;
+        if (count === length) {
+          deferred.resolve(values);
         }
       }, deferred.reject);
     }
@@ -154,7 +190,7 @@ var p = (function () {
       }
     }
     if (length === 0) {
-      deferred.resolve(resolvedValues);
+      deferred.resolve(values);
     }
     return deferred.promise;
   }
