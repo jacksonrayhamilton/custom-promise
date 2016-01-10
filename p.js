@@ -1,4 +1,4 @@
-/*jshint loopfunc: true, strict: false */
+/*jshint strict: false */
 /*global setTimeout */
 
 /*jshint -W098 */
@@ -54,6 +54,7 @@ var p = (function () {
     var valueOrReason;
     var pending = [];
     function iteratePending(offset, iteratee) {
+      /*jshint loopfunc: true */
       var p;
       while ((p = pending.shift())) {
         (function (callback, promise, resolve, reject) {
