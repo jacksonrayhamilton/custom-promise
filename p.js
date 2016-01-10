@@ -7,6 +7,14 @@ var p = (function () {
 
   var task = setTimeout;
 
+  function isObject(value) {
+    return value && typeof value === 'object';
+  }
+
+  function isArray(value) {
+    return {}.toString.call(value) === '[object Array]';
+  }
+
   function isFunction(value) {
     return typeof value === 'function';
   }
@@ -15,7 +23,7 @@ var p = (function () {
     if (promise === x) {
       throw TypeError();
     }
-    if ((x && typeof x === 'object') || isFunction(x)) {
+    if (isObject(x) || isFunction(x)) {
       var called = 0;
       try {
         var then = x.then;
@@ -54,14 +62,14 @@ var p = (function () {
     var valueOrReason;
     var queue = [];
     function emptyQueue(offset, iteratee) {
-      /*jshint loopfunc: true */
+      function taskIteratee(callback, promise, resolve, reject) {
+        task(function () {
+          iteratee(callback, promise, resolve, reject);
+        });
+      }
       var item;
       while ((item = queue.shift())) {
-        (function (callback, promise, resolve, reject) {
-          task(function () {
-            iteratee(callback, promise, resolve, reject);
-          });
-        }(item[offset], item[2], item[3], item[4]));
+        taskIteratee(item[offset], item[2], item[3], item[4]);
       }
     }
     function callOnFulfilleds() {
@@ -138,43 +146,47 @@ var p = (function () {
     return deferred.promise;
   }
 
+  function reject(reason) {
+    var deferred = defer();
+    deferred.reject(reason);
+    return deferred.promise;
+  }
+
+  function all(collection) {
+    var array = isArray(collection);
+    var deferred = defer();
+    var resolvedValues = array ? [] : {};
+    var resolvedCount = 0;
+    var length = array ? collection.length : 0;
+    function iteratee(key) {
+      resolve(collection[key]).then(function (value) {
+        resolvedValues[key] = value;
+        resolvedCount += 1;
+        if (resolvedCount === length) {
+          deferred.resolve(resolvedValues);
+        }
+      }, deferred.reject);
+    }
+    if (array) {
+      for (var i = 0; i < length; i += 1) {
+        iteratee(i);
+      }
+    } else {
+      for (var key in collection) {
+        if ({}.hasOwnProperty.call(collection, key)) {
+          length += 1;
+          iteratee(key);
+        }
+      }
+    }
+    return deferred.promise;
+  }
+
   return {
     defer: defer,
     resolve: resolve,
-    reject: function (reason) {
-      var deferred = defer();
-      deferred.reject(reason);
-      return deferred.promise;
-    },
-    all: function (collection) {
-      var array = {}.toString.call(collection) === '[object Array]';
-      var deferred = defer();
-      var resolvedValues = array ? [] : {};
-      var resolvedCount = 0;
-      var length = array ? collection.length : 0;
-      function iteratee(key) {
-        resolve(collection[key]).then(function (value) {
-          resolvedValues[key] = value;
-          resolvedCount += 1;
-          if (resolvedCount === length) {
-            deferred.resolve(resolvedValues);
-          }
-        }, deferred.reject);
-      }
-      if (array) {
-        for (var i = 0; i < length; i += 1) {
-          iteratee(i);
-        }
-      } else {
-        for (var key in collection) {
-          if ({}.hasOwnProperty.call(collection, key)) {
-            length += 1;
-            iteratee(key);
-          }
-        }
-      }
-      return deferred.promise;
-    }
+    reject: reject,
+    all: all
   };
 
 }());
