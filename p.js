@@ -179,6 +179,9 @@ var p = (function () {
         }
       }
     }
+    if (length === 0) {
+      deferred.resolve(resolvedValues);
+    }
     return deferred.promise;
   }
 
