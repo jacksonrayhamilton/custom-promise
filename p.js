@@ -1,27 +1,11 @@
-/*jshint laxcomma: true, strict: false */
+/*jshint laxcomma: true, plusplus: false, strict: false */
 /*global setTimeout */
 /*exported p */
 
 var p = (function () {
 
-  var task = setTimeout;
-
-  function isObject(value) {
-    return value && typeof value === 'object';
-  }
-
-  // @ifdef EXTRA
-  function isArray(value) {
-    return {}.toString.call(value) === '[object Array]';
-  }
-
-  // @endif
-  function isFunction(value) {
-    return typeof value === 'function';
-  }
-
   function defer() {
-    // Flag to prevent multiple fulfillments or rejections.
+    // Truthy flag to prevent multiple fulfillments or rejections.
     var fulfilledOrRejected;
 
     // Fulfilled state is 1, rejected is 2.
@@ -37,7 +21,7 @@ var p = (function () {
     function callCallbacks() {
       var callback;
       while ((callback = callbacks.shift())) {
-        task(callback);
+        setTimeout(callback);
       }
     }
 
@@ -54,9 +38,12 @@ var p = (function () {
         // A fulfillment value should be handled by `resolve`.  The return value
         // of `onFulfilled` or `onRejected` should be handled by `resolve`.  An
         // unhandled rejection reason should be passed to `reject`.
-        var resolveOrReject = (state < 2 || isFunction(callback)) ? resolve : reject;
+        var resolveOrReject =
+          (state < 2 || typeof callback === 'function') ? resolve : reject;
         try {
-          resolveOrReject(isFunction(callback) ? callback(valueOrReason) : valueOrReason);
+          resolveOrReject(
+            typeof callback === 'function' ? callback(valueOrReason) : valueOrReason
+          );
         } catch (e) {
           reject(e);
         }
@@ -68,58 +55,45 @@ var p = (function () {
       return deferred.promise;
     }
 
-    // @ifdef EXTRA
-    // Access the current or eventual reason of `promise`.
-    function promiseCatch(onRejected) {
-      return promiseThen(0, onRejected);
-    }
-
-    // @endif
     var promise = {
       then: promiseThen
       // @ifdef EXTRA
-      , 'catch': promiseCatch // Quotes for old IE
+      // Access the current or eventual reason of `promise`.
+      , 'catch': function (onRejected) { // Quotes for old IE
+        return promiseThen(0, onRejected);
+      }
       // @endif
     };
 
-    // Reject, unguarded.
-    function rejectInner(reason) {
-      state = 2;
-      valueOrReason = reason;
-      callCallbacks();
-    }
-
-    // Reject `promise` with `reason`.
-    function reject(reason) {
-      if (fulfilledOrRejected) {
-        return;
-      }
-      rejectInner(reason);
-      fulfilledOrRejected = 1;
-    }
-
-    // Resolve, unguarded.  Implements the promise resolution procedure.
-    function resolveInner(x) {
+    // Implements the promise resolution procedure.
+    function resolutionProcedure(x) {
       if (promise === x) {
         throw TypeError();
       }
+      // Truthy flag to prevent multiple fulfillments or rejections.
       var called;
+      var then;
       try {
-        var then;
-        if ((isObject(x) || isFunction(x)) && isFunction(then = x.then)) {
+        if (
+          ((x && typeof x === 'object') || typeof x === 'function') &&
+          typeof (then = x.then) === 'function'
+        ) {
           // Try to make `promise` adopt the state of `x`, a thenable.
           then.call(x, function (y) {
             if (called) {
               return;
             }
-            called = 1;
-            resolveInner(y);
+            // Set "called" flag.
+            called = 2;
+            resolutionProcedure(y);
           }, function (r) {
             if (called) {
               return;
             }
-            called = 1;
-            rejectInner(r);
+            // Set rejected state while also setting "called" flag.
+            called = state = 2;
+            valueOrReason = r;
+            callCallbacks();
           });
         } else {
           // Fulfill `promise` with `x`, a non-thenable.
@@ -128,27 +102,34 @@ var p = (function () {
           callCallbacks();
         }
       } catch (e) {
-        if (called) {
-          return;
-        }
-        called = 1;
-        rejectInner(e);
+        // Uglify wasn't optimizing the following line for some reason.  It is
+        // the same logic as in the onRejected callback above.
+        /*jshint nocomma: false, -W030 */
+        called ||
+          (called = state = 2, valueOrReason = e, callCallbacks());
+        /*jshint nocomma: true, +W030 */
       }
-    }
-
-    // Fulfill `promise` with `value`.
-    function resolve(value) {
-      if (fulfilledOrRejected) {
-        return;
-      }
-      resolveInner(value);
-      fulfilledOrRejected = 1;
     }
 
     return {
       promise: promise,
-      resolve: resolve,
-      reject: reject
+      // Fulfill `promise` with `value`.
+      resolve: function (value) {
+        if (fulfilledOrRejected) {
+          return;
+        }
+        resolutionProcedure(value);
+        fulfilledOrRejected = 1;
+      },
+      // Reject `promise` with `reason`.
+      reject: function (reason) {
+        if (fulfilledOrRejected) {
+          return;
+        }
+        fulfilledOrRejected = state = 2;
+        valueOrReason = reason;
+        callCallbacks();
+      }
     };
   }
 
@@ -160,55 +141,51 @@ var p = (function () {
     return deferred.promise;
   }
 
-  // Create a promise rejected with `reason`.
-  function reject(reason) {
-    var deferred = defer();
-    deferred.reject(reason);
-    return deferred.promise;
-  }
-
-  // Create a promise fulfilled with the values of `collection` or rejected by
-  // one value of `collection`, where `collection` is an array or object.
-  function all(collection) {
-    var array = isArray(collection);
-    var deferred = defer();
-    var values = array ? [] : {};
-    var count = 0;
-    var length = array ? collection.length : 0;
-    function iteratee(key) {
-      resolve(collection[key]).then(function (value) {
-        values[key] = value;
-        count += 1;
-        if (count === length) {
-          deferred.resolve(values);
-        }
-      }, deferred.reject);
-    }
-    if (array) {
-      for (var i = 0; i < length; i += 1) {
-        iteratee(i);
-      }
-    } else {
-      for (var key in collection) {
-        if ({}.hasOwnProperty.call(collection, key)) {
-          length += 1;
-          iteratee(key);
-        }
-      }
-    }
-    if (length === 0) {
-      deferred.resolve(values);
-    }
-    return deferred.promise;
-  }
-
   // @endif
   return {
     defer: defer
     // @ifdef EXTRA
     , resolve: resolve
-    , reject: reject
-    , all: all
+    // Create a promise rejected with `reason`.
+    , reject: function (reason) {
+      var deferred = defer();
+      deferred.reject(reason);
+      return deferred.promise;
+    }
+    // Create a promise fulfilled with the values of `collection` or rejected by
+    // one value of `collection`, where `collection` is an array or object.
+    , all: function (collection) {
+      var array = {}.toString.call(collection) === '[object Array]';
+      var deferred = defer();
+      var values = array ? [] : {};
+      var count = 0;
+      var length = array ? collection.length : 0;
+      function iteratee(key) {
+        resolve(collection[key]).then(function (value) {
+          values[key] = value;
+          if (++count === length) { // Increment and then compare.
+            deferred.resolve(values);
+          }
+        }, deferred.reject);
+      }
+      var key = 0;
+      if (array) {
+        while (key < length) {
+          iteratee(key++); // Pass current key and then increment.
+        }
+      } else {
+        for (key in collection) {
+          if ({}.hasOwnProperty.call(collection, key)) {
+            ++length;
+            iteratee(key);
+          }
+        }
+      }
+      if (!length) {
+        deferred.resolve(values);
+      }
+      return deferred.promise;
+    }
     // @endif
   };
 
