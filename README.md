@@ -42,6 +42,10 @@ Create a promise resolving with values from `collection`.  Each value in
 If any value in `collection` is rejected, the promise is rejected. `collection`
 can be an array or an object.
 
+A "micro" build is also available without `catch`, `resolve`, `reject`, or
+`all`, which are useful, but not strictly necessary for creating A+-compliant
+promises.
+
 ## Examples
 
 Create a promise and print its value:
