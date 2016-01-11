@@ -1,4 +1,4 @@
-/*jshint strict: false */
+/*jshint laxcomma: true, strict: false */
 /*global setTimeout */
 /*exported p */
 
@@ -10,10 +10,12 @@ var p = (function () {
     return value && typeof value === 'object';
   }
 
+  // @ifdef EXTRA
   function isArray(value) {
     return {}.toString.call(value) === '[object Array]';
   }
 
+  // @endif
   function isFunction(value) {
     return typeof value === 'function';
   }
@@ -66,14 +68,18 @@ var p = (function () {
       return deferred.promise;
     }
 
+    // @ifdef EXTRA
     // Access the current or eventual reason of `promise`.
     function promiseCatch(onRejected) {
       return promiseThen(0, onRejected);
     }
 
+    // @endif
     var promise = {
-      then: promiseThen,
-      'catch': promiseCatch // Quotes for old IE
+      then: promiseThen
+      // @ifdef EXTRA
+      , 'catch': promiseCatch // Quotes for old IE
+      // @endif
     };
 
     // Reject, unguarded.
@@ -146,6 +152,7 @@ var p = (function () {
     };
   }
 
+  // @ifdef EXTRA
   // Create a promise fulfilled with `value`.
   function resolve(value) {
     var deferred = defer();
@@ -195,11 +202,14 @@ var p = (function () {
     return deferred.promise;
   }
 
+  // @endif
   return {
-    defer: defer,
-    resolve: resolve,
-    reject: reject,
-    all: all
+    defer: defer
+    // @ifdef EXTRA
+    , resolve: resolve
+    , reject: reject
+    , all: all
+    // @endif
   };
 
 }());
