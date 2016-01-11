@@ -13,5 +13,6 @@
     "lodash": "^3.10.1",
     "mocha": "^2.3.4",
     "promises-aplus-tests": "^2.1.1"
-  }
+  },
+  "main": "build/p.commonjs.js"
 }

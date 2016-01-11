@@ -4,7 +4,7 @@
 
 var assert = require('better-assert');
 var isEqual = require('lodash/lang/isEqual');
-var p = require('./build/p.commonjs.js');
+var p = require('./');
 
 describe('Promises/A+ Tests', function () {
 
