@@ -35,10 +35,11 @@ Create a promise rejected with `reason`.
 
 ### `p.all(collection)`
 
-Create a promise resolving with values from `collection`.  Each value in
-`collection` must be fulfilled by `p.resolve` before the promise is fulfilled.
-If any value in `collection` is rejected, the promise is rejected. `collection`
-can be an array-like object or an object.
+Create a promise resolving the values in `collection`.  If `collection` is
+array-like (has a `length` property), the promise is resolved with an array,
+else with an object.  Each value in `collection` must be fulfilled by
+`p.resolve` before the promise is fulfilled.  If any value in `collection` is
+rejected, the promise is rejected.
 
 A "micro" build is also available without `catch`, `resolve`, `reject`, or
 `all`, which are useful, but not strictly necessary for creating A+-compliant
