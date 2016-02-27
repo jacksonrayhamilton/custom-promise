@@ -32,7 +32,7 @@ module.exports = function (grunt) {
     var options = moduleType.options;
     config.concat[name] = {
       options: options,
-      src: 'p.js',
+      src: 'build/p.js',
       dest: 'build/p.' + name + '.js'
     };
   });
