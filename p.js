@@ -28,10 +28,6 @@ var p = (function () {
     // Access the current or eventual value or reason of `promise`.
     var promiseThen = function (onFulfilled, onRejected) {
       var deferred = defer();
-      // Detach these methods to guarantee a reference to them even after
-      // `deferred` is returned and potentially tampered-with.
-      var resolve = deferred.resolve;
-      var reject = deferred.reject;
       callbacks.push(function () {
         // Call the callback for the state of `promise`.
         var callback = state < 2 ? onFulfilled : onRejected;
@@ -39,13 +35,15 @@ var p = (function () {
         // of `onFulfilled` or `onRejected` should be handled by `resolve`.  An
         // unhandled rejection reason should be passed to `reject`.
         var resolveOrReject =
-          (state < 2 || typeof callback === 'function') ? resolve : reject;
+            (state < 2 || typeof callback === 'function') ?
+            deferred.resolve :
+            deferred.reject;
         try {
           resolveOrReject(
             typeof callback === 'function' ? callback(valueOrReason) : valueOrReason
           );
         } catch (e) {
-          reject(e);
+          deferred.reject(e);
         }
       });
       if (state) {
