@@ -31,15 +31,13 @@ var p = (function () {
       callbacks.push(function () {
         // Call the callback for the state of `promise`.
         var callback = state < 2 ? onFulfilled : onRejected;
-        // A fulfillment value should be handled by `resolve`.  The return value
-        // of `onFulfilled` or `onRejected` should be handled by `resolve`.  An
-        // unhandled rejection reason should be passed to `reject`.
-        var resolveOrReject =
-            (state < 2 || typeof callback === 'function') ?
-            deferred.resolve :
-            deferred.reject;
         try {
-          resolveOrReject(
+          // A fulfillment value should be resolved.  The return value of
+          // `onFulfilled` or `onRejected` should be resolved.  An unhandled
+          // rejection reason should be rejected.
+          ((state < 2 || typeof callback === 'function') ?
+           deferred.resolve :
+           deferred.reject)(
             typeof callback === 'function' ? callback(valueOrReason) : valueOrReason
           );
         } catch (e) {
