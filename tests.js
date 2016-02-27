@@ -6,10 +6,19 @@ var assert = require('better-assert');
 var isEqual = require('lodash/lang/isEqual');
 var p = require('./');
 
+var defer = function () {
+  var deferred = {};
+  deferred.promise = p(function (resolve, reject) {
+    deferred.resolve = resolve;
+    deferred.reject = reject;
+  });
+  return deferred;
+};
+
 describe('Promises/A+ Tests', function () {
 
   var adapter = {
-    deferred: p.defer,
+    deferred: defer,
     resolved: p.resolve,
     rejected: p.reject
   };
@@ -25,8 +34,8 @@ describe('p.all', function () {
     var first, second;
 
     beforeEach(function () {
-      first = p.defer();
-      second = p.defer();
+      first = defer();
+      second = defer();
 
       // Out-of-order so we can test the order too.
       second.resolve(2);
@@ -74,8 +83,8 @@ describe('p.all', function () {
   });
 
   it('should reject if any promise is rejected', function (done) {
-    var first = p.defer();
-    var second = p.defer();
+    var first = defer();
+    var second = defer();
 
     var expectedReason = {};
     first.reject(expectedReason);

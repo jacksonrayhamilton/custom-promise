@@ -4,7 +4,7 @@
 
 var p = (function () {
 
-  var defer = function () {
+  var p = function (executor) {
     // Truthy flag to prevent multiple fulfillments or rejections.
     var fulfilledOrRejected;
 
@@ -27,28 +27,26 @@ var p = (function () {
 
     // Access the current or eventual value or reason of `promise`.
     var promiseThen = function (onFulfilled, onRejected) {
-      var deferred = defer();
-      callbacks.push(function () {
-        // Call the callback for the state of `promise`.
-        var callback = state < 2 ? onFulfilled : onRejected;
-        try {
-          // A fulfillment value should be resolved.  The return value of
-          // `onFulfilled` or `onRejected` should be resolved.  An unhandled
-          // rejection reason should be rejected.
-          ((state < 2 || typeof callback === 'function') ?
-           deferred.resolve :
-           deferred.reject)(
-            typeof callback === 'function' ? callback(valueOrReason) : valueOrReason
-          );
-        } catch (e) {
-          deferred.reject(e);
+      return p(function (resolve, reject) {
+        callbacks.push(function () {
+          // Call the callback for the state of `promise`.
+          var callback = state < 2 ? onFulfilled : onRejected;
+          try {
+            // A fulfillment value should be resolved.  The return value of
+            // `onFulfilled` or `onRejected` should be resolved.  An unhandled
+            // rejection reason should be rejected.
+            ((state < 2 || typeof callback === 'function') ? resolve : reject)(
+              typeof callback === 'function' ? callback(valueOrReason) : valueOrReason
+            );
+          } catch (e) {
+            reject(e);
+          }
+        });
+        if (state) {
+          // If `promise` is already fulfilled, call its callbacks presently.
+          callCallbacks();
         }
       });
-      if (state) {
-        // If `promise` is already fulfilled, call its callbacks presently.
-        callCallbacks();
-      }
-      return deferred.promise;
     };
 
     var promise = {
@@ -107,10 +105,9 @@ var p = (function () {
       }
     };
 
-    return {
-      promise: promise,
+    executor(
       // Fulfill `promise` with `value`.
-      resolve: function (value) {
+      function (value) {
         if (fulfilledOrRejected) {
           return;
         }
@@ -118,7 +115,7 @@ var p = (function () {
         fulfilledOrRejected = 1;
       },
       // Reject `promise` with `reason`.
-      reject: function (reason) {
+      function (reason) {
         if (fulfilledOrRejected) {
           return;
         }
@@ -126,42 +123,42 @@ var p = (function () {
         valueOrReason = reason;
         callCallbacks();
       }
-    };
+    );
+
+    return promise;
   };
 
   // @ifdef EXTRA
   // Create a promise fulfilled with `value`.
-  var resolve = function (value) {
-    var deferred = defer();
-    deferred.resolve(value);
-    return deferred.promise;
+  var pResolve = p.resolve = function (value) {
+    return p(function (resolve, reject) {
+      /*jshint unused: false */
+      resolve(value);
+    });
   };
 
-  // @endif
-  return {
-    defer: defer
-    // @ifdef EXTRA
-    , resolve: resolve
-    // Create a promise rejected with `reason`.
-    , reject: function (reason) {
-      var deferred = defer();
-      deferred.reject(reason);
-      return deferred.promise;
-    }
-    // Create a promise fulfilled with the values of `collection` or rejected by
-    // one value of `collection`, where `collection` is an array or object.
-    , all: function (collection) {
-      var deferred = defer();
+  // Create a promise rejected with `reason`.
+  p.reject = function (reason) {
+    return p(function (resolve, reject) {
+      /*jshint unused: true */
+      reject(reason);
+    });
+  };
+
+  // Create a promise fulfilled with the values of `collection` or rejected by
+  // one value of `collection`, where `collection` is an [array-like] object.
+  p.all = function (collection) {
+    return p(function (resolve, reject) {
       var count = 0;
       var length = 'length' in collection ? collection.length : 0;
       var values = 'length' in collection ? [] : {};
       var iteratee = function (key) {
-        resolve(collection[key]).then(function (value) {
+        pResolve(collection[key]).then(function (value) {
           values[key] = value;
           if (++count === length) { // Increment and then compare.
-            deferred.resolve(values);
+            resolve(values);
           }
-        }, deferred.reject);
+        }, reject);
       };
       var key = 0;
       if ('length' in collection) {
@@ -177,11 +174,12 @@ var p = (function () {
         }
       }
       if (!length) {
-        deferred.resolve(values);
+        resolve(values);
       }
-      return deferred.promise;
-    }
-    // @endif
+    });
   };
+  // @endif
+
+  return p;
 
 }());

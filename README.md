@@ -2,19 +2,17 @@
 
 A small, useful and secure A+ promise library.
 
-- Small: About 550 bytes minified and gzipped.  About 350 bytes when built only
+- Small: About 500 bytes minified and gzipped.  About 320 bytes when built only
   for A+ compliance.
 - Useful: `catch`, `resolve`, `reject`, `all`, old IE support.
 - Secure: No private state exposed.
 
 ## API
 
-### `p.defer()`
+### `p(executor)`
 
-Create a deferred object with these properties:
-
-- `promise`: A promise.
-- `resolve`, `reject`: Methods to fulfill or reject the promise.
+Create a promise. `executor` is a function immediately executed with `resolve`
+and `reject` functions as parameters, which fulfill or reject the promise.
 
 ### `promise.then(onFulfilled, onRejected)`
 
@@ -56,20 +54,20 @@ p.resolve('Hello World!').then(function (value) {
 });
 ```
 
-You can use `p.defer` to manage promises.  In the following example, a promise
-is created, it is randomly fulfilled or rejected, and fulfillment and rejection
+You can use `p()` to manage promises.  In the following example, a promise is
+created, it is randomly fulfilled or rejected, and fulfillment and rejection
 handlers are registered on the promise:
 
 ```js
-var deferred = p.defer();
-setTimeout(function () {
-  if (Math.random() < 0.5) {
-    deferred.resolve(true);
-  } else {
-    deferred.reject(false);
-  }
-});
-deferred.promise.then(function (value) {
+p(function (resolve, reject) {
+  setTimeout(function () {
+    if (Math.random() < 0.5) {
+      resolve(true);
+    } else {
+      reject(false);
+    }
+  });
+}).then(function (value) {
   console.log(value);
 }, function (reason) {
   console.error(reason);
