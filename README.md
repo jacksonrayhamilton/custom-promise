@@ -40,7 +40,7 @@ Create a promise rejected with `reason`.
 Create a promise resolving with values from `collection`.  Each value in
 `collection` must be fulfilled by `p.resolve` before the promise is fulfilled.
 If any value in `collection` is rejected, the promise is rejected. `collection`
-can be an array or an object.
+can be an array-like object or an object.
 
 A "micro" build is also available without `catch`, `resolve`, `reject`, or
 `all`, which are useful, but not strictly necessary for creating A+-compliant

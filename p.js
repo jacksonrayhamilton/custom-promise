@@ -4,7 +4,7 @@
 
 var p = (function () {
 
-  function defer() {
+  var defer = function () {
     // Truthy flag to prevent multiple fulfillments or rejections.
     var fulfilledOrRejected;
 
@@ -18,15 +18,15 @@ var p = (function () {
     var callbacks = [];
 
     // Execute all pending handlers asynchronously.
-    function callCallbacks() {
+    var callCallbacks = function () {
       var callback;
       while ((callback = callbacks.shift())) {
         setTimeout(callback);
       }
-    }
+    };
 
     // Access the current or eventual value or reason of `promise`.
-    function promiseThen(onFulfilled, onRejected) {
+    var promiseThen = function (onFulfilled, onRejected) {
       var deferred = defer();
       // Detach these methods to guarantee a reference to them even after
       // `deferred` is returned and potentially tampered-with.
@@ -53,7 +53,7 @@ var p = (function () {
         callCallbacks();
       }
       return deferred.promise;
-    }
+    };
 
     var promise = {
       then: promiseThen
@@ -66,7 +66,7 @@ var p = (function () {
     };
 
     // Implements the promise resolution procedure.
-    function resolutionProcedure(x) {
+    var resolutionProcedure = function (x) {
       if (promise === x) {
         throw TypeError();
       }
@@ -109,7 +109,7 @@ var p = (function () {
           (called = state = 2, valueOrReason = e, callCallbacks());
         /*jshint nocomma: true, +W030 */
       }
-    }
+    };
 
     return {
       promise: promise,
@@ -131,15 +131,15 @@ var p = (function () {
         callCallbacks();
       }
     };
-  }
+  };
 
   // @ifdef EXTRA
   // Create a promise fulfilled with `value`.
-  function resolve(value) {
+  var resolve = function (value) {
     var deferred = defer();
     deferred.resolve(value);
     return deferred.promise;
-  }
+  };
 
   // @endif
   return {
@@ -155,21 +155,20 @@ var p = (function () {
     // Create a promise fulfilled with the values of `collection` or rejected by
     // one value of `collection`, where `collection` is an array or object.
     , all: function (collection) {
-      var array = {}.toString.call(collection) === '[object Array]';
       var deferred = defer();
-      var values = array ? [] : {};
       var count = 0;
-      var length = array ? collection.length : 0;
-      function iteratee(key) {
+      var length = 'length' in collection ? collection.length : 0;
+      var values = 'length' in collection ? [] : {};
+      var iteratee = function (key) {
         resolve(collection[key]).then(function (value) {
           values[key] = value;
           if (++count === length) { // Increment and then compare.
             deferred.resolve(values);
           }
         }, deferred.reject);
-      }
+      };
       var key = 0;
-      if (array) {
+      if ('length' in collection) {
         while (key < length) {
           iteratee(key++); // Pass current key and then increment.
         }
