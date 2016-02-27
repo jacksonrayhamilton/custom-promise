@@ -104,3 +104,18 @@ p.all({
   var friends = results.friends;
 });
 ```
+
+## Use cases
+
+This library aims to provide reliable promises in as few bytes as possible.  It
+is suited for suitations where network latency is a concern (e.g. web browsers)
+and for users concerned with behavioral correctness.  Its small size makes it a
+good candidate for inclusion within other libraries.
+
+This library is not concerned with being the most performant promise
+implementation (in terms of task delay, CPU cycles and memory), as that could
+cost bytes and compromise security.  Other promise libraries may be better
+suited for especially stressful scenarios.
+
+This library does not provide a polyfill for the `Promise` constructor or its
+methods.  However, being A+-compliant, the promises are interoperable.
