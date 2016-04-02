@@ -1,82 +1,83 @@
-/*jshint node: true */
+/* eslint-env node */
+
 'use strict';
+
+var build = require('./build');
+var loadGruntTasks = require('load-grunt-tasks');
+
 module.exports = function (grunt) {
-  require('load-grunt-tasks')(grunt);
+
+  loadGruntTasks(grunt);
+
   var config = {};
+
+  config.clean = {
+    build: ['build/**']
+  };
+
   config.compress = {
     all: {
       options: {
         mode: 'gzip'
       },
-      files: {
-        'build/p.min.js.gz': 'build/p.min.js',
-        'build/p.micro.min.js.gz': 'build/p.micro.min.js'
-      }
+      files: [{
+        expand: true,
+        cwd: 'build/',
+        src: ['*.min.js'],
+        dest: 'build/',
+        rename: function (dest, src) {
+          return dest + src.replace('.min.js', '.min.js.gz');
+        }
+      }]
     }
   };
-  var moduleTypes = [
-    {
-      name: 'commonjs',
-      options: {
-        footer: 'module.exports = p;'
-      }
-    }
-  ];
-  config.concat = {
-    options: {
-      separator: ''
-    }
-  };
-  moduleTypes.forEach(function (moduleType) {
-    var name = moduleType.name;
-    var options = moduleType.options;
-    config.concat[name] = {
-      options: options,
-      src: 'build/p.js',
-      dest: 'build/p.' + name + '.js'
-    };
-  });
-  config.jshint = {
+
+  config.eslint = {
     all: {
-      src: ['p.js']
+      src: ['*.js', 'build/*.js', '!build/*.min.js']
     }
   };
+
   config.mochaTest = {
     all: {
       src: ['tests.js']
     }
   };
-  config.preprocess = {
-    extra: {
-      options: {
-        context: {
-          EXTRA: true
-        }
-      },
-      src: 'p.js',
-      dest: 'build/p.js'
-    },
-    micro: {
-      src: 'p.js',
-      dest: 'build/p.micro.js'
-    }
-  };
+
   config.uglify = {
     all: {
-      files: {
-        'build/p.min.js': 'build/p.js',
-        'build/p.micro.min.js': 'build/p.micro.js'
-      }
+      files: [{
+        expand: true,
+        cwd: 'build/',
+        src: ['*.js', '!*.min.js'],
+        dest: 'build/',
+        rename: function (dest, src) {
+          return dest + src.replace('.js', '.min.js');
+        }
+      }]
     }
   };
+
   config.watch = {
     build: {
-      files: ['p.js'],
+      files: ['src/**'],
       tasks: ['build']
     }
   };
+
   grunt.initConfig(config);
-  grunt.registerTask('build', ['preprocess', 'concat', 'uglify', 'compress']);
+
+  grunt.registerTask('template', function () {
+    grunt.file.write('build/p.js', build({catch: 1, resolve: 1, reject: 1, all: 1, ie: 1}));
+    grunt.file.write('build/p.modern.js', build({catch: 1, resolve: 1, reject: 1, all: 1}));
+    grunt.file.write('build/p.catch.js', build({catch: 1, ie: 1}));
+    grunt.file.write('build/p.catch.modern.js', build({catch: 1}));
+    grunt.file.write('build/p.micro.js', build({ie: 1}));
+    grunt.file.write('build/p.micro.modern.js', build());
+    grunt.file.write('build/p.node.js', build({catch: 1, resolve: 1, reject: 1, all: 1, node: 1}));
+  });
+
+  grunt.registerTask('build', ['clean', 'template', 'uglify', 'compress']);
   grunt.registerTask('serve', ['build', 'watch']);
-  grunt.registerTask('test', ['jshint', 'mochaTest']);
+  grunt.registerTask('test', ['eslint', 'mochaTest']);
 };

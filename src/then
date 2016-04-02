@@ -1,0 +1,22 @@
+function (onFulfilled, onRejected) {
+  return p(function (resolve, reject) {
+    callbacks.push(function () {
+      // Call the callback for the state of `promise`.
+      var callback = state < 2 ? onFulfilled : onRejected;
+      try {
+        // A fulfillment value should be resolved.  The return value of
+        // `onFulfilled` or `onRejected` should be resolved.  An unhandled
+        // rejection reason should be rejected.
+        ((state < 2 || typeof callback === 'function') ? resolve : reject)(
+          typeof callback === 'function' ? callback(valueOrReason) : valueOrReason
+        );
+      } catch (e) {
+        reject(e);
+      }
+    });
+    if (state) {
+      // If `promise` is already fulfilled, call its callbacks presently.
+      callCallbacks();
+    }
+  });
+}
