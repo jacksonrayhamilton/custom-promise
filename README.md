@@ -41,9 +41,8 @@ else with an object.  Each value in `collection` must be fulfilled by
 `p.resolve` before the promise is fulfilled.  If any value in `collection` is
 rejected, the promise is rejected.
 
-A "micro" build is also available without `catch`, `resolve`, `reject`, or
-`all`, which are useful, but not strictly necessary for creating A+-compliant
-promises.
+A "micro" build is also available without `catch`, `resolve`, `reject`, `all` or
+`race`, which are useful, but not strictly necessary for A+-compliance.
 
 ## Examples
 
@@ -102,6 +101,18 @@ p.all({
 }).then(function (results) {
   var user = results.user;
   var friends = results.friends;
+});
+```
+
+When only the value of one promise in a set of promises matters, you can use
+`p.race` with an [array-like] object:
+
+```js
+p.race([
+  takeRisk(),
+  playItSafe()
+]).then(function (result) {
+  console.log('Did ' + result + ' as it was faster');
 });
 ```
 

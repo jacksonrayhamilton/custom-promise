@@ -83,13 +83,15 @@ module.exports = function (grunt) {
   grunt.initConfig(config);
 
   grunt.registerTask('template', function () {
-    grunt.file.write('build/p.js', build({catch: 1, resolve: 1, reject: 1, all: 1, ie: 1}));
-    grunt.file.write('build/p.modern.js', build({catch: 1, resolve: 1, reject: 1, all: 1}));
+    grunt.file.write('build/p.js', build({catch: 1, resolve: 1, reject: 1, all: 1, race: 1, ie: 1}));
+    grunt.file.write('build/p.modern.js', build({catch: 1, resolve: 1, reject: 1, all: 1, race: 1}));
     grunt.file.write('build/p.catch.js', build({catch: 1, ie: 1}));
     grunt.file.write('build/p.catch.modern.js', build({catch: 1}));
+    grunt.file.write('build/p.all.js', build({all: 1}));
+    grunt.file.write('build/p.race.js', build({race: 1}));
     grunt.file.write('build/p.micro.js', build({ie: 1}));
     grunt.file.write('build/p.micro.modern.js', build());
-    grunt.file.write('build/p.node.js', build({catch: 1, resolve: 1, reject: 1, all: 1, node: 1}));
+    grunt.file.write('build/p.node.js', build({catch: 1, resolve: 1, reject: 1, all: 1, race: 1, node: 1}));
   });
 
   grunt.registerTask('build', ['clean', 'template', 'uglify', 'compress']);

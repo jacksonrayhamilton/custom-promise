@@ -121,41 +121,19 @@
     return p(function (resolve, reject) {
       reject(reason);
     });
-  };<% } %><% if (includeAll) { %>
+  };<% } %><% if (includeAll && includeRace) { %>
+
+  // Create an `all` or `race` function.
+  var allRace = <%= allRace %>;<% } %><% if (includeAll) { %>
 
   // Create a promise fulfilled with the values of `collection` or rejected by
   // one value of `collection`, where `collection` is an [array-like] object.
-  p.all = function (collection) {
-    return p(function (resolve, reject) {
-      var count = 0;
-      var length = 'length' in collection ? collection.length : 0;
-      var values = 'length' in collection ? [] : {};
-      var iteratee = function (key) {
-        pResolve(collection[key]).then(function (value) {
-          values[key] = value;
-          if (++count === length) { // Increment and then compare.
-            resolve(values);
-          }
-        }, reject);
-      };
-      var key = 0;
-      if ('length' in collection) {
-        while (key < length) {
-          iteratee(key++); // Pass current key and then increment.
-        }
-      } else {
-        for (key in collection) {
-          if ({}.hasOwnProperty.call(collection, key)) {
-            ++length;
-            iteratee(key);
-          }
-        }
-      }
-      if (!length) {
-        resolve(values);
-      }
-    });
-  };<% } %><% if (wrap) { %>
+  p.all = <%= all %>;<% } %><% if (includeRace) { %>
+
+  // Create a promise fulfilled with the first value of `collection` to resolve
+  // or rejected by one value of `collection`, where `collection` is an
+  // [array-like] object.
+  p.race = <%= race %>;<% } %><% if (wrap) { %>
 
   return p;
 

@@ -1,0 +1,33 @@
+<% if (includeBoth) { %>function (all) {
+  return <% } %>function (collection) {
+    return p(function (resolve, reject) {
+      <% if (includeAll) { %>var count = 0;
+      var values = 'length' in collection ? [] : {};
+      <% } %>var length = 'length' in collection ? collection.length : 0;
+      var iteratee = function (key) {
+        pResolve(collection[key]).then(<% if (includeBoth) { %>all ? <% } %><% if (includeAll) { %>function (value) {
+          values[key] = value;
+          if (++count === length) { // Increment and then compare.
+            resolve(values);
+          }
+        }<% } %><% if (includeBoth) { %> : <% } %><% if (includeRace) { %>resolve<% } %>, reject);
+      };
+      var key = 0;
+      if ('length' in collection) {
+        while (key < length) {
+          iteratee(key++); // Pass current key and then increment.
+        }
+      } else {
+        for (key in collection) {
+          if ({}.hasOwnProperty.call(collection, key)) {
+            ++length;
+            iteratee(key);
+          }
+        }
+      }<% if (includeAll) { %>
+      if (<% if (includeBoth) { %>all && <% } %>!length) {
+        resolve(values);
+      }<% } %>
+    });
+  }<% if (includeBoth) { %>;
+}<% } %>
