@@ -9,7 +9,7 @@
     "grunt-eslint": "^18.0.0",
     "grunt-mocha-test": "^0.12.7",
     "load-grunt-tasks": "^3.4.0",
-    "lodash": "^3.10.1",
+    "lodash": "^4.7.0",
     "mocha": "^2.3.4",
     "promises-aplus-tests": "^2.1.1"
   },

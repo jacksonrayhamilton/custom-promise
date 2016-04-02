@@ -3,7 +3,7 @@
 'use strict';
 
 var assert = require('better-assert');
-var isEqual = require('lodash/lang/isEqual');
+var isEqual = require('lodash/isEqual');
 
 var defer = require('./defer');
 var p = require('../');

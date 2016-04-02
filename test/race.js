@@ -3,7 +3,7 @@
 'use strict';
 
 var assert = require('assert');
-var once = require('lodash/function/once');
+var once = require('lodash/once');
 
 var defer = require('./defer');
 var p = require('../');

@@ -4,7 +4,7 @@
 'use strict';
 
 var fs = require('fs');
-var template = require('lodash/string/template');
+var template = require('lodash/template');
 var pTemplate = template(fs.readFileSync('templates/p', 'utf8'));
 var thenTemplate = template(fs.readFileSync('templates/then', 'utf8'));
 var allRaceTemplate = template(fs.readFileSync('templates/allRace', 'utf8'));
