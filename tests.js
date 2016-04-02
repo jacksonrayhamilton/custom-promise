@@ -1,10 +1,11 @@
-/*jshint mocha: true, node: true */
+/* eslint-env mocha, node */
 
 'use strict';
 
 var assert = require('better-assert');
 var isEqual = require('lodash/lang/isEqual');
 var p = require('./');
+var promisesAplusTests = require('promises-aplus-tests');
 
 var defer = function () {
   var deferred = {};
@@ -23,7 +24,7 @@ describe('Promises/A+ Tests', function () {
     rejected: p.reject
   };
 
-  require('promises-aplus-tests').mocha(adapter);
+  promisesAplusTests.mocha(adapter);
 
 });
 
