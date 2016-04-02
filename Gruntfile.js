@@ -40,7 +40,7 @@ module.exports = function (grunt) {
 
   config.mochaTest = {
     all: {
-      src: ['tests.js']
+      src: ['test/**.js']
     }
   };
 

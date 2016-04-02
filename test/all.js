@@ -4,29 +4,9 @@
 
 var assert = require('better-assert');
 var isEqual = require('lodash/lang/isEqual');
-var p = require('./');
-var promisesAplusTests = require('promises-aplus-tests');
 
-var defer = function () {
-  var deferred = {};
-  deferred.promise = p(function (resolve, reject) {
-    deferred.resolve = resolve;
-    deferred.reject = reject;
-  });
-  return deferred;
-};
-
-describe('Promises/A+ Tests', function () {
-
-  var adapter = {
-    deferred: defer,
-    resolved: p.resolve,
-    rejected: p.reject
-  };
-
-  promisesAplusTests.mocha(adapter);
-
-});
+var defer = require('./defer');
+var p = require('../');
 
 describe('p.all', function () {
 
