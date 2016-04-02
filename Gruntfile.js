@@ -44,18 +44,33 @@ module.exports = function (grunt) {
     }
   };
 
-  config.uglify = {
-    all: {
+  var getBaseUglifyConfig = function () {
+    return {
       files: [{
         expand: true,
         cwd: 'build/',
-        src: ['*.js', '!*.min.js'],
         dest: 'build/',
         rename: function (dest, src) {
           return dest + src.replace('.js', '.min.js');
         }
       }]
-    }
+    };
+  };
+
+  config.uglify = {
+    ie: (function () {
+      var uglifyConfig = getBaseUglifyConfig();
+      uglifyConfig.files[0].src = ['*.js', '!*.modern.js', '!*.min.js'];
+      return uglifyConfig;
+    }()),
+    modern: (function () {
+      var uglifyConfig = getBaseUglifyConfig();
+      uglifyConfig.options = {
+        screwIE8: true
+      };
+      uglifyConfig.files[0].src = ['*.modern.js', '!*.min.js'];
+      return uglifyConfig;
+    }())
   };
 
   config.watch = {
