@@ -3,7 +3,7 @@
 
 'use strict';
 
-var build = require('../build');
+var build = require('../tools/build');
 var UglifyJS = require('uglify-js');
 var zlib = require('zlib');
 

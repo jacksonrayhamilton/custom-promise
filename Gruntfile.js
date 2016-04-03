@@ -2,7 +2,7 @@
 
 'use strict';
 
-var build = require('./build');
+var build = require('./tools/build');
 var connectLivereload = require('connect-livereload');
 var loadGruntTasks = require('load-grunt-tasks');
 var path = require('path');
