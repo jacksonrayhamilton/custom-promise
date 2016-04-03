@@ -10,7 +10,9 @@ A small, useful and secure A+ promise library.
 ## Customize
 
 You can build your own version of p.js with only the methods and environment
-support that you want: http://jacksonrayhamilton.github.io/p.js/
+support that you want.  Take the [p.js Customizer][] for a spin!
+
+[p.js Customizer]: http://jacksonrayhamilton.github.io/p.js/
 
 ## API
 
