@@ -2,9 +2,9 @@
 
 A small, useful and secure A+ promise library.
 
-- Small: About 500 bytes minified and gzipped.  About 320 bytes when built only
+- Small: About 500 bytes minified and gzipped.  About 300 bytes when built only
   for A+ compliance.
-- Useful: `catch`, `resolve`, `reject`, `all`, old IE support.
+- Useful: `catch`, `resolve`, `reject`, `all`, `race`, old IE support.
 - Secure: No private state exposed.
 
 ## API
