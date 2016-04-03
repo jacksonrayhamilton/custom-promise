@@ -206,26 +206,27 @@ module.exports = function (grunt) {
 
   // QA
 
-  config.eslint = {
-    all: {
-      src: [
-        '*.js',
-        'customizer/**.js',
-        'test/**.js',
-        'build/module/**.js',
-        '!build/module/**.min.js'
-      ]
-    }
-  };
-
-  config.mochaTest = {
-    all: {
-      src: ['test/**.js'],
-      options: {
-        clearRequireCache: true
+  merge(config, {
+    eslint: {
+      all: {
+        src: [
+          '*.js',
+          'customizer/**.js',
+          'test/**.js',
+          'build/module/**.js',
+          '!build/module/**.min.js'
+        ]
+      }
+    },
+    mochaTest: {
+      all: {
+        src: ['test/**.js'],
+        options: {
+          clearRequireCache: true
+        }
       }
     }
-  };
+  });
 
   grunt.registerTask('test', ['module', 'eslint', 'mochaTest']);
 
