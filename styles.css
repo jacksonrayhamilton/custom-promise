@@ -7,3 +7,8 @@ body {
   list-style-type: none;
   padding: 0;
 }
+
+.customizer-task-function {
+  /* Use a smaller width for narrow iDevices. */
+  width: 10em;
+}
