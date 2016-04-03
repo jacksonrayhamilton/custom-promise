@@ -44,23 +44,6 @@ module.exports = function (grunt) {
     ]
   };
 
-  config.compress = {
-    module: {
-      options: {
-        mode: 'gzip'
-      },
-      files: [{
-        expand: true,
-        cwd: 'build/module/',
-        src: ['*.min.js'],
-        dest: 'build/module/',
-        rename: function (dest, src) {
-          return dest + src.replace('.min.js', '.min.js.gz');
-        }
-      }]
-    }
-  };
-
   config.connect = {
     customizer: {
       options: {
@@ -120,19 +103,6 @@ module.exports = function (grunt) {
     }
   };
 
-  var getBaseUglifyConfig = function () {
-    return {
-      files: [{
-        expand: true,
-        cwd: 'build/module/',
-        dest: 'build/module/',
-        rename: function (dest, src) {
-          return dest + src.replace('.js', '.min.js');
-        }
-      }]
-    };
-  };
-
   config.replace = {
     customizer: {
       src: ['build/customizer/*.js'],
@@ -167,25 +137,6 @@ module.exports = function (grunt) {
       dest: 'build/customizer/builder-worker.js'
     }
   };
-
-  grunt.registerTask('uglify:module', function () {
-    grunt.config('uglify', {
-      ie: (function () {
-        var uglifyConfig = getBaseUglifyConfig();
-        uglifyConfig.files[0].src = ['*.js', '!*.modern.js', '!*.min.js'];
-        return uglifyConfig;
-      }()),
-      modern: (function () {
-        var uglifyConfig = getBaseUglifyConfig();
-        uglifyConfig.options = {
-          screwIE8: true
-        };
-        uglifyConfig.files[0].src = ['*.modern.js', '!*.min.js'];
-        return uglifyConfig;
-      }())
-    });
-    grunt.task.run(['uglify']);
-  });
 
   config.usemin = {
     options: {
@@ -222,22 +173,20 @@ module.exports = function (grunt) {
   grunt.initConfig(config);
 
   grunt.registerTask('template:module', function () {
-    grunt.file.write('build/module/p.js', build({catch: 1, resolve: 1, reject: 1, all: 1, race: 1, ie: 1}));
-    grunt.file.write('build/module/p.modern.js', build({catch: 1, resolve: 1, reject: 1, all: 1, race: 1}));
-    grunt.file.write('build/module/p.catch.js', build({catch: 1, ie: 1}));
-    grunt.file.write('build/module/p.catch.modern.js', build({catch: 1}));
-    grunt.file.write('build/module/p.all.js', build({all: 1}));
-    grunt.file.write('build/module/p.race.js', build({race: 1}));
-    grunt.file.write('build/module/p.micro.js', build({ie: 1}));
-    grunt.file.write('build/module/p.micro.modern.js', build());
-    grunt.file.write('build/module/p.node.js', build({catch: 1, resolve: 1, reject: 1, all: 1, race: 1, node: 1}));
+    grunt.file.write('build/module/p.node.js', build({
+      catch: true,
+      resolve: true,
+      reject: true,
+      all: true,
+      race: true,
+      node: true,
+      task: 'process.nextTick'
+    }));
   });
 
   grunt.registerTask('module', [
     'clean:module',
-    'template:module',
-    'uglify:module',
-    'compress:module'
+    'template:module'
   ]);
 
   grunt.registerTask('customizerBase', [
@@ -268,6 +217,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask('web', ['customizer:web']);
   grunt.registerTask('serve', ['module', 'customizer:serve', 'watch']);
-  grunt.registerTask('test', ['eslint', 'mochaTest']);
+  grunt.registerTask('test', ['module', 'eslint', 'mochaTest']);
 
 };
