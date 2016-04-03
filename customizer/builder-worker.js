@@ -1,4 +1,5 @@
 /* eslint-env worker */
+/* eslint-disable camelcase */
 
 'use strict';
 
@@ -19,7 +20,16 @@ var startBuild = function (options) {
   stats.uncompressed = buildOutput.length;
 
   var uglifyOutput = UglifyJS.minify(buildOutput, {
-    fromString: true
+    fromString: true,
+    mangle: {
+      screw_ie8: !options.ie
+    },
+    output: {
+      screw_ie8: !options.ie
+    },
+    compress: {
+      screw_ie8: !options.ie
+    }
   }).code;
   stats.uglified = uglifyOutput.length;
 
