@@ -4,7 +4,9 @@
 
 var build = require('./build');
 var connectLivereload = require('connect-livereload');
+var escapeRegExp = require('lodash/escapeRegExp');
 var loadGruntTasks = require('load-grunt-tasks');
+var path = require('path');
 
 module.exports = function (grunt) {
 
@@ -32,7 +34,7 @@ module.exports = function (grunt) {
     module: ['build/module/**'],
     customizer: ['build/customizer/**'],
     postWeb: [
-      'build/customizer/bundle.js',
+      'build/customizer/bundle.*.js',
       'build/customizer/node_modules/**'
     ]
   };
@@ -85,10 +87,7 @@ module.exports = function (grunt) {
 
   config.filerev = {
     build: {
-      src: [
-        'build/customizer/styles.css',
-        'build/customizer/scripts.js'
-      ]
+      src: ['build/customizer/*.{css,js}']
     }
   };
 
@@ -127,6 +126,25 @@ module.exports = function (grunt) {
         }
       }]
     };
+  };
+
+  config.replace = {
+    customizer: {
+      files: [{
+        expand: true,
+        cwd: 'build/customizer/',
+        src: ['*.js'],
+        dest: 'build/customizer/'
+      }],
+      options: {
+        patterns: [{
+          match: new RegExp(escapeRegExp('builder-worker.js'), 'g'),
+          replacement: function () {
+            return path.basename(grunt.filerev.summary['build/customizer/builder-worker.js']);
+          }
+        }]
+      }
+    }
   };
 
   config.sync = {
@@ -242,6 +260,7 @@ module.exports = function (grunt) {
     'uglify:generated',
     'uglify:customizer',
     'filerev',
+    'replace:customizer',
     'usemin',
     'htmlmin',
     'clean:postWeb'
