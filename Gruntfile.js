@@ -210,9 +210,10 @@ module.exports = function (grunt) {
     all: {
       src: [
         '*.js',
-        'customizer/*.js',
-        'build/module/*.js',
-        '!build/module/*.min.js'
+        'customizer/**.js',
+        'test/**.js',
+        'build/module/**.js',
+        '!build/module/**.min.js'
       ]
     }
   };
@@ -230,7 +231,22 @@ module.exports = function (grunt) {
 
   // Development
 
+  // Build the module and the customizer continuously.
   grunt.registerTask('serve', ['module', 'customizer:serve', 'watch']);
+
+  // In tandem with `grunt serve`, run tests continuously.
+  grunt.registerTask('tdd', function () {
+    grunt.config('watch', {
+      tdd: {
+        files: ['build/module/**.js', 'test/**.js'],
+        tasks: ['eslint', 'mochaTest'],
+        options: {
+          spawn: false
+        }
+      }
+    });
+    grunt.task.run(['watch']);
+  });
 
   // Initialization
 
