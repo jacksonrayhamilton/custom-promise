@@ -14,6 +14,7 @@ var createCustomizer = function (options) {
 
   extend(customizer, new Emitter());
 
+  var featureChooserForm = element.querySelector('[data-customizer-feature-chooser]');
   var optionInputs = {
     catch: element.querySelector('[data-customizer-option-catch]'),
     resolve: element.querySelector('[data-customizer-option-resolve]'),
@@ -24,7 +25,6 @@ var createCustomizer = function (options) {
     node: element.querySelector('[data-customizer-option-node]'),
     task: element.querySelector('[data-customizer-option-task]')
   };
-  var buildButton = element.querySelector('[data-customizer-build]');
   var outputTextarea = element.querySelector('[data-customizer-output]');
   var statSpans = {
     uncompressed: element.querySelector('[data-customizer-stat-uncompressed]'),
@@ -42,7 +42,8 @@ var createCustomizer = function (options) {
     customizer.emit('build', buildOptions);
   };
 
-  buildButton.addEventListener('click', function () {
+  featureChooserForm.addEventListener('submit', function (event) {
+    event.preventDefault();
     build();
   });
 
