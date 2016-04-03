@@ -1,0 +1,9 @@
+body {
+  margin: 30px;
+}
+
+.customizer-feature-list {
+  /* Override default list styling. */
+  list-style-type: none;
+  padding: 0;
+}
