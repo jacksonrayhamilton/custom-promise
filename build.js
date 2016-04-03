@@ -31,16 +31,8 @@ var dedentCode = function (code, levels) {
 var build = function (options) {
   options = options || {};
 
-  var node = Boolean(options.node);
-
-  var task =
-      options.task ? options.task
-      : node ? 'process.nextTick'
-      : 'setTimeout';
-  var globals = options.globals || (
-      (options.task || node) ? []
-      : ['setTimeout']
-  );
+  var task = options.task || 'setTimeout';
+  var globals = options.globals || (options.task ? [] : ['setTimeout']);
 
   var exposeCatch = Boolean(options.catch);
   var exposeResolve = Boolean(options.resolve);
@@ -59,6 +51,8 @@ var build = function (options) {
   var ie = Boolean(options.ie);
   var catchKey = ie ? '\'catch\'' : 'catch';
   var catchKeyComment = ie ? ' // Quotes for old IE' : '';
+
+  var node = Boolean(options.node);
 
   var wrap =
       ((includeResolve || includeReject || includeAll || includeRace) && !node) ||
