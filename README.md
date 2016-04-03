@@ -53,12 +53,10 @@ rejected, the promise is rejected.
 Create a promise resolving with the first value to resolve in `collection` via
 `p.resolve`.  If any value in `collection` is rejected, the promise is rejected.
 
-A "micro" build is also available without `catch`, `resolve`, `reject`, `all` or
-`race`, which are useful, but not strictly necessary for A+-compliance.
-
 ## Examples
 
-Create a promise and print its value:
+You can use `p.resolve` to create a promise and `then` to handle its
+fulfillment:
 
 ```js
 p.resolve('Hello World!').then(function (value) {
@@ -66,9 +64,9 @@ p.resolve('Hello World!').then(function (value) {
 });
 ```
 
-You can use `p()` to manage promises.  In the following example, a promise is
-created, it is randomly fulfilled or rejected, and fulfillment and rejection
-handlers are registered on the promise:
+You can use `p()` to manage promises.  Here, a promise is created, it is
+randomly fulfilled or rejected, and fulfillment and rejection handlers are
+registered on the promise:
 
 ```js
 p(function (resolve, reject) {
