@@ -14,6 +14,7 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-eslint": "^18.0.0",
     "grunt-mocha-test": "^0.12.7",
+    "grunt-sync": "^0.5.2",
     "load-grunt-tasks": "^3.4.0",
     "lodash": "4.6.1",
     "mocha": "^2.3.4",

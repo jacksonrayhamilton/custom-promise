@@ -68,21 +68,6 @@ module.exports = function (grunt) {
     }
   };
 
-  config.copy = {
-    customizer: {
-      files: [{
-        expand: true,
-        cwd: 'customizer/',
-        src: ['**', '!*.js'],
-        dest: 'build/customizer/'
-      }, {
-        expand: true,
-        src: ['node_modules/bootstrap/dist/**'],
-        dest: 'build/customizer/'
-      }]
-    }
-  };
-
   config.eslint = {
     all: {
       src: [
@@ -113,6 +98,21 @@ module.exports = function (grunt) {
     };
   };
 
+  config.sync = {
+    customizer: {
+      files: [{
+        expand: true,
+        cwd: 'customizer/',
+        src: ['**', '!*.js'],
+        dest: 'build/customizer/'
+      }, {
+        expand: true,
+        src: ['node_modules/bootstrap/dist/**'],
+        dest: 'build/customizer/'
+      }]
+    }
+  };
+
   config.uglify = {
     ie: (function () {
       var uglifyConfig = getBaseUglifyConfig();
@@ -137,7 +137,7 @@ module.exports = function (grunt) {
     },
     customizer: {
       files: ['customizer/**/*'],
-      tasks: ['copy:customizer']
+      tasks: ['sync:customizer']
     },
     customizerBuild: {
       files: ['build/customizer/**/*'],
@@ -170,11 +170,12 @@ module.exports = function (grunt) {
 
   grunt.registerTask('customizer', [
     'clean:customizer',
-    'copy:customizer',
+    'sync:customizer',
     'browserify:customizer',
     'connect:customizer'
   ]);
 
   grunt.registerTask('serve', ['module', 'customizer', 'watch']);
   grunt.registerTask('test', ['eslint', 'mochaTest']);
+
 };
