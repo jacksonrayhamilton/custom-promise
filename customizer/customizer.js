@@ -21,7 +21,8 @@ var createCustomizer = function (options) {
     all: element.querySelector('[data-customizer-option-all]'),
     race: element.querySelector('[data-customizer-option-race]'),
     ie: element.querySelector('[data-customizer-option-ie]'),
-    node: element.querySelector('[data-customizer-option-node]')
+    node: element.querySelector('[data-customizer-option-node]'),
+    task: element.querySelector('[data-customizer-option-task]')
   };
   var buildButton = element.querySelector('[data-customizer-build]');
   var outputTextarea = element.querySelector('[data-customizer-output]');
