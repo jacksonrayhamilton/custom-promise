@@ -4,7 +4,6 @@
 
 var build = require('./build');
 var connectLivereload = require('connect-livereload');
-var escapeRegExp = require('lodash/escapeRegExp');
 var loadGruntTasks = require('load-grunt-tasks');
 var path = require('path');
 
@@ -130,20 +129,14 @@ module.exports = function (grunt) {
 
   config.replace = {
     customizer: {
-      files: [{
-        expand: true,
-        cwd: 'build/customizer/',
-        src: ['*.js'],
-        dest: 'build/customizer/'
-      }],
-      options: {
-        patterns: [{
-          match: new RegExp(escapeRegExp('builder-worker.js'), 'g'),
-          replacement: function () {
-            return path.basename(grunt.filerev.summary['build/customizer/builder-worker.js']);
-          }
-        }]
-      }
+      src: ['build/customizer/*.js'],
+      overwrite: true,
+      replacements: [{
+        from: 'builder-worker.js',
+        to: function () {
+          return path.basename(grunt.filerev.summary['build/customizer/builder-worker.js']);
+        }
+      }]
     }
   };
 
