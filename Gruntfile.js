@@ -13,14 +13,20 @@ module.exports = function (grunt) {
 
   var config = {};
 
+  var browserifyFiles = {
+    'build/customizer/bundle.js': 'customizer/main.js',
+    'build/customizer/builder-worker.js': 'customizer/builder-worker.js'
+  };
   config.browserify = {
+    options: {
+      transform: ['brfs']
+    },
     customizer: {
-      files: {
-        'build/customizer/bundle.js': 'customizer/main.js',
-        'build/customizer/builder-worker.js': 'customizer/builder-worker.js'
-      },
+      files: browserifyFiles
+    },
+    customizerServe: {
+      files: browserifyFiles,
       options: {
-        transform: ['brfs'],
         watch: true,
         browserifyOptions: {
           debug: true
@@ -236,17 +242,18 @@ module.exports = function (grunt) {
 
   grunt.registerTask('customizerBase', [
     'clean:customizer',
-    'sync:customizer',
-    'browserify:customizer'
+    'sync:customizer'
   ]);
 
   grunt.registerTask('customizer:serve', [
     'customizerBase',
+    'browserify:customizerServe',
     'connect:customizer'
   ]);
 
   grunt.registerTask('customizer:web', [
     'customizerBase',
+    'browserify:customizer',
     'useminPrepare',
     'concat:generated',
     'cssmin:generated',
