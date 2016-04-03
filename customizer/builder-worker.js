@@ -55,7 +55,7 @@ var startBuild = function (options) {
 onmessage = function (event) {
   if (event.data.name === 'build') {
     startBuild(event.data.options);
-  } else if (event.data.name === 'canceled') {
+  } else if (event.data.name === 'cancel') {
     if (running) {
       canceled = true;
     }
