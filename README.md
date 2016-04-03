@@ -7,6 +7,11 @@ A small, useful and secure A+ promise library.
 - Useful: `catch`, `resolve`, `reject`, `all`, `race`, old IE support.
 - Secure: No private state exposed.
 
+## Customize
+
+You can build your own version of p.js with only the methods and environment
+support that you want: http://jacksonrayhamilton.github.io/p.js/
+
 ## API
 
 ### `p(executor)`
