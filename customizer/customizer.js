@@ -42,6 +42,10 @@ var createCustomizer = function (options) {
     customizer.emit('build', buildOptions);
   };
 
+  featureChooserForm.addEventListener('change', function () {
+    customizer.build();
+  });
+
   featureChooserForm.addEventListener('submit', function (event) {
     event.preventDefault();
     customizer.build();
