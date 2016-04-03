@@ -46,6 +46,11 @@ else with an object.  Each value in `collection` must be fulfilled by
 `p.resolve` before the promise is fulfilled.  If any value in `collection` is
 rejected, the promise is rejected.
 
+### `p.race(collection)`
+
+Create a promise resolving with the first value to resolve in `collection` via
+`p.resolve`.  If any value in `collection` is rejected, the promise is rejected.
+
 A "micro" build is also available without `catch`, `resolve`, `reject`, `all` or
 `race`, which are useful, but not strictly necessary for A+-compliance.
 
