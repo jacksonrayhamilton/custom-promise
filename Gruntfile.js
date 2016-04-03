@@ -21,7 +21,7 @@ module.exports = function (grunt) {
     options: {
       transform: ['brfs']
     },
-    customizer: {
+    customizerWeb: {
       files: browserifyFiles
     },
     customizerServe: {
@@ -202,7 +202,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('customizer:web', [
     'customizerBase',
-    'browserify:customizer',
+    'browserify:customizerWeb',
     'useminPrepare',
     'concat:generated',
     'cssmin:generated',
