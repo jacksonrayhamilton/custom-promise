@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>p.js Customizer</title>
+    <meta name="description" content="A build tool for custom, light-weight promises"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="styles.css"/>
+  </head>
+  <body>
+    <h1>p.js Customizer</h1>
+    <p>
+      Select features to include:
+    </p>
+    <ul class="customizer-feature-list">
+      <li><label><input data-customizer-option-catch="" type="checkbox"/> promise.catch()</label></li>
+      <li><label><input data-customizer-option-resolve="" type="checkbox"/> p.resolve()</label></li>
+      <li><label><input data-customizer-option-reject="" type="checkbox"/> p.reject()</label></li>
+      <li><label><input data-customizer-option-all="" type="checkbox"/> p.all()</label></li>
+      <li><label><input data-customizer-option-race="" type="checkbox"/> p.race()</label></li>
+      <li><label><input data-customizer-option-ie="" type="checkbox"/> Old IE support</label></li>
+      <li><label><input data-customizer-option-node="" type="checkbox"/> Node.js module</label></li>
+    </ul>
+    <p>
+      <button data-customizer-build="">Build</button>
+    </p>
+    <h2>Output</h2>
+    <p>
+      <textarea data-customizer-output=""></textarea>
+    </p>
+    <p>
+      Uncompressed: <span data-customizer-stat-uncompressed=""></span><br/>
+      Uglified: <span data-customizer-stat-uglified=""></span><br/>
+      Uglified+gzipped: <span data-customizer-stat-uglified-gzipped=""></span>
+    </p>
+    <script src="bundle.js"></script>
+  </body>
+</html>
