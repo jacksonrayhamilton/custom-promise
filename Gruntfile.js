@@ -30,7 +30,11 @@ module.exports = function (grunt) {
 
   config.clean = {
     module: ['build/module/**'],
-    customizer: ['build/customizer/**']
+    customizer: ['build/customizer/**'],
+    postWeb: [
+      'build/customizer/bundle.js',
+      'build/customizer/node_modules/**'
+    ]
   };
 
   config.compress = {
@@ -79,6 +83,33 @@ module.exports = function (grunt) {
     }
   };
 
+  config.filerev = {
+    build: {
+      src: [
+        'build/customizer/styles.css',
+        'build/customizer/scripts.js'
+      ]
+    }
+  };
+
+  config.htmlmin = {
+    build: {
+      options: {
+        removeComments: true,
+        collapseWhitespace: true,
+        conservativeCollapse: true,
+        collapseBooleanAttributes: true,
+        removeAttributeQuotes: true,
+        removeRedundantAttributes: true,
+        removeEmptyAttributes: true,
+        removeOptionalTags: true
+      },
+      files: {
+        'build/customizer/index.html': 'build/customizer/index.html'
+      }
+    }
+  };
+
   config.mochaTest = {
     all: {
       src: ['test/**.js']
@@ -114,19 +145,43 @@ module.exports = function (grunt) {
   };
 
   config.uglify = {
-    ie: (function () {
-      var uglifyConfig = getBaseUglifyConfig();
-      uglifyConfig.files[0].src = ['*.js', '!*.modern.js', '!*.min.js'];
-      return uglifyConfig;
-    }()),
-    modern: (function () {
-      var uglifyConfig = getBaseUglifyConfig();
-      uglifyConfig.options = {
-        screwIE8: true
-      };
-      uglifyConfig.files[0].src = ['*.modern.js', '!*.min.js'];
-      return uglifyConfig;
-    }())
+    customizer: {
+      src: 'build/customizer/builder-worker.js',
+      dest: 'build/customizer/builder-worker.js'
+    }
+  };
+
+  grunt.registerTask('uglify:module', function () {
+    grunt.config('uglify', {
+      ie: (function () {
+        var uglifyConfig = getBaseUglifyConfig();
+        uglifyConfig.files[0].src = ['*.js', '!*.modern.js', '!*.min.js'];
+        return uglifyConfig;
+      }()),
+      modern: (function () {
+        var uglifyConfig = getBaseUglifyConfig();
+        uglifyConfig.options = {
+          screwIE8: true
+        };
+        uglifyConfig.files[0].src = ['*.modern.js', '!*.min.js'];
+        return uglifyConfig;
+      }())
+    });
+    grunt.task.run(['uglify']);
+  });
+
+  config.usemin = {
+    options: {
+      assetsDirs: ['build/customizer/']
+    },
+    html: 'build/customizer/index.html'
+  };
+
+  config.useminPrepare = {
+    options: {
+      dest: 'build/customizer/'
+    },
+    html: 'build/customizer/index.html'
   };
 
   // Have to use `**/*` due to issue #481.
@@ -164,18 +219,36 @@ module.exports = function (grunt) {
   grunt.registerTask('module', [
     'clean:module',
     'template:module',
-    'uglify',
+    'uglify:module',
     'compress:module'
   ]);
 
-  grunt.registerTask('customizer', [
+  grunt.registerTask('customizerBase', [
     'clean:customizer',
     'sync:customizer',
-    'browserify:customizer',
+    'browserify:customizer'
+  ]);
+
+  grunt.registerTask('customizer:serve', [
+    'customizerBase',
     'connect:customizer'
   ]);
 
-  grunt.registerTask('serve', ['module', 'customizer', 'watch']);
+  grunt.registerTask('customizer:web', [
+    'customizerBase',
+    'useminPrepare',
+    'concat:generated',
+    'cssmin:generated',
+    'uglify:generated',
+    'uglify:customizer',
+    'filerev',
+    'usemin',
+    'htmlmin',
+    'clean:postWeb'
+  ]);
+
+  grunt.registerTask('web', ['customizer:web']);
+  grunt.registerTask('serve', ['module', 'customizer:serve', 'watch']);
   grunt.registerTask('test', ['eslint', 'mochaTest']);
 
 };

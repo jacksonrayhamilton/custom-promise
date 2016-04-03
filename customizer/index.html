@@ -6,8 +6,10 @@
     <title>p.js Customizer</title>
     <meta name="description" content="A build tool for custom, light-weight promises"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <!-- build:css styles.css -->
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css"/>
     <link rel="stylesheet" href="styles.css"/>
+    <!-- endbuild -->
   </head>
   <body>
     <h1>p.js Customizer</h1>
@@ -38,6 +40,8 @@
       Uglified: <span data-customizer-stat-uglified=""></span><br/>
       Uglified+gzipped: <span data-customizer-stat-uglified-gzipped=""></span>
     </p>
+    <!-- build:js scripts.js -->
     <script src="bundle.js"></script>
+    <!-- endbuild -->
   </body>
 </html>
