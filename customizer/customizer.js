@@ -32,7 +32,7 @@ var createCustomizer = function (options) {
     uglifiedGzipped: element.querySelector('[data-customizer-stat-uglified-gzipped]')
   };
 
-  var build = function () {
+  customizer.build = function () {
     var buildOptions = mapValues(optionInputs, function (input) {
       if (input.type === 'checkbox') {
         return input.checked;
@@ -44,7 +44,7 @@ var createCustomizer = function (options) {
 
   featureChooserForm.addEventListener('submit', function (event) {
     event.preventDefault();
-    build();
+    customizer.build();
   });
 
   customizer.complete = function (results) {

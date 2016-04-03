@@ -17,3 +17,5 @@ customizer.on('build', function (options) {
 builder.on('complete', function (results) {
   customizer.complete(results);
 });
+
+customizer.build();
