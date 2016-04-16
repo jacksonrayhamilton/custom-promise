@@ -347,4 +347,12 @@ describe('build', function () {
     assertReport(examineCode(build({node: true, race: true})), expected);
   });
 
+  it('should customize the task function', function () {
+    assertReport(examineCode(build({
+      task: 'setImmediate'
+    })), {
+      taskFunction: 'setImmediate'
+    });
+  });
+
 });
