@@ -301,4 +301,14 @@ describe('build', function () {
     });
   });
 
+  it('should export a node module', function () {
+    assertReport(examineCode(build({
+      node: true
+    })), {
+      hasTopLevelFunction: true,
+      hasNamedFunctionExpression: false,
+      hasNodeModule: true
+    });
+  });
+
 });
