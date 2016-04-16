@@ -1,5 +1,3 @@
-/* eslint-env mocha */
-
 'use strict';
 
 var defer = require('./defer');
