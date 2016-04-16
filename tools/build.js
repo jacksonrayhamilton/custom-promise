@@ -44,9 +44,9 @@ var build = function (options) {
   var includeReject = exposeReject;
   var includeAll = exposeAll;
   var includeRace = exposeRace;
-  var includeResolve = exposeResolve || includeReject || includeAll || includeRace;
+  var includeResolve = exposeResolve || includeAll || includeRace;
 
-  var referenceResolve = includeReject || includeAll || includeRace;
+  var referenceResolve = includeAll || includeRace;
 
   var ie = Boolean(options.ie);
   var catchKey = ie ? '\'catch\'' : 'catch';
