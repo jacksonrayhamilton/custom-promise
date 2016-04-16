@@ -4,6 +4,8 @@
     "bootstrap": "^3.3.6",
     "brfs": "^1.4.3",
     "connect-livereload": "^0.5.4",
+    "esprima": "^2.7.2",
+    "esprima-walk": "^0.1.0",
     "grunt": "^0.4.5",
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-clean": "^0.7.0",
