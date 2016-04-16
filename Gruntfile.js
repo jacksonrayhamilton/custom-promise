@@ -6,7 +6,6 @@ var build = require('./tools/build');
 var connectLivereload = require('connect-livereload');
 var loadGruntTasks = require('load-grunt-tasks');
 var merge = require('lodash/merge');
-var path = require('path');
 
 module.exports = function (grunt) {
 
@@ -74,7 +73,7 @@ module.exports = function (grunt) {
     clean: {
       customizer: ['build/customizer/**'],
       postWeb: [
-        'build/customizer/bundle.*.js',
+        'build/customizer/bundle.js',
         'build/customizer/node_modules/**'
       ]
     },
@@ -95,11 +94,6 @@ module.exports = function (grunt) {
         }
       }
     },
-    filerev: {
-      customizer: {
-        src: ['build/customizer/*.{css,js}']
-      }
-    },
     htmlmin: {
       customizer: {
         options: {
@@ -115,18 +109,6 @@ module.exports = function (grunt) {
         files: {
           'build/customizer/index.html': 'build/customizer/index.html'
         }
-      }
-    },
-    replace: {
-      customizer: {
-        src: ['build/customizer/*.js'],
-        overwrite: true,
-        replacements: [{
-          from: 'builder-worker.js',
-          to: function () {
-            return path.basename(grunt.filerev.summary['build/customizer/builder-worker.js']);
-          }
-        }]
       }
     },
     sync: {
@@ -195,8 +177,6 @@ module.exports = function (grunt) {
     'cssmin:generated',
     'uglify:generated',
     'uglify:customizer',
-    'filerev:customizer',
-    'replace:customizer',
     'usemin',
     'htmlmin:customizer',
     'clean:postWeb'
