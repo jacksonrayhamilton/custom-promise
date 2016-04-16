@@ -1,8 +1,6 @@
 'use strict';
 
-var assert = require('better-assert');
-var isEqual = require('lodash/isEqual');
-
+var assert = require('assert');
 var defer = require('./defer');
 var p = require('../');
 
@@ -27,7 +25,7 @@ describe('p.all', function () {
         second.promise,
         3 // Test non-promises too.
       ]).then(function (results) {
-        assert(isEqual(results, [1, 2, 3]));
+        assert.deepStrictEqual(results, [1, 2, 3]);
         done();
       }).catch(done);
     });
@@ -38,7 +36,7 @@ describe('p.all', function () {
         second: second.promise,
         third: 3
       }).then(function (results) {
-        assert(isEqual(results, {first: 1, second: 2, third: 3}));
+        assert.deepStrictEqual(results, {first: 1, second: 2, third: 3});
         done();
       }).catch(done);
     });
@@ -48,14 +46,14 @@ describe('p.all', function () {
   describe('emptiness', function () {
     it('should resolve an empty array', function (done) {
       p.all([]).then(function (results) {
-        assert(isEqual(results, []));
+        assert.deepStrictEqual(results, []);
         done();
       }).catch(done);
     });
 
     it('should resolve an empty object', function (done) {
       p.all({}).then(function (results) {
-        assert(isEqual(results, {}));
+        assert.deepStrictEqual(results, {});
         done();
       }).catch(done);
     });
