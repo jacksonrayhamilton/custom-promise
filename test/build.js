@@ -53,6 +53,14 @@ var hasCatch = function (node) {
   );
 };
 
+var hasQuotedCatch = function (node) {
+  return (
+    node.type === 'VariableDeclarator' &&
+      node.id.name === 'promise' &&
+      get(node, 'init.properties[1].key.raw') === '\'catch\''
+  );
+};
+
 var hasResolveReference = function (node) {
   return (
     node.type === 'VariableDeclarator' &&
@@ -102,6 +110,7 @@ var examineCode = function (code) {
     hasInlineThen: false,
     hasThenReference: false,
     hasCatch: false,
+    hasQuotedCatch: false,
     hasResolveReference: false,
     hasExposedResolve: false,
     hasResolve: false,
@@ -128,6 +137,9 @@ var examineCode = function (code) {
       report.hasThenReference = true;
     }
     if (hasCatch(node)) {
+      if (hasQuotedCatch(node)) {
+        report.hasQuotedCatch = true;
+      }
       report.hasCatch = true;
     }
     if (hasResolveReference(node)) {
@@ -183,6 +195,27 @@ describe('build', function () {
       hasAll: false,
       hasRace: false,
       hasNodeModule: false
+    });
+  });
+
+  it('should enable catch', function () {
+    assertReport(examineCode(build({
+      catch: true
+    })), {
+      hasInlineThen: false,
+      hasThenReference: true,
+      hasCatch: true,
+      hasQuotedCatch: false
+    });
+  });
+
+  it('should quote catch for ie', function () {
+    assertReport(examineCode(build({
+      catch: true,
+      ie: true
+    })), {
+      hasCatch: true,
+      hasQuotedCatch: true
     });
   });
 
