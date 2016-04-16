@@ -22,7 +22,7 @@
     "grunt-text-replace": "^0.4.0",
     "grunt-usemin": "^3.1.1",
     "load-grunt-tasks": "^3.4.0",
-    "lodash": "4.6.1",
+    "lodash": "^4.11.1",
     "mocha": "^2.3.4",
     "promises-aplus-tests": "^2.1.1",
     "tiny-emitter": "^1.0.2",
