@@ -219,4 +219,21 @@ describe('build', function () {
     });
   });
 
+  it('should enable resolve', function () {
+    assertReport(examineCode(build({
+      resolve: true
+    })), {
+      hasResolveReference: false,
+      hasExposedResolve: true
+    });
+  });
+
+  it('should enable reject', function () {
+    assertReport(examineCode(build({
+      reject: true
+    })), {
+      hasReject: true
+    });
+  });
+
 });
