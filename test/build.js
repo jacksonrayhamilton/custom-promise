@@ -93,6 +93,22 @@ var hasRace = function (node) {
   return hasExposed(node, 'race');
 };
 
+var hasInlineAll;
+var hasInlineRace;
+hasInlineAll = hasInlineRace = function (node) {
+  return (
+    node.type === 'AssignmentExpression' &&
+      node.right.type === 'FunctionExpression'
+  );
+};
+
+var hasAllRace = function (node) {
+  return (
+    node.type === 'VariableDeclarator' &&
+      node.id.name === 'allRace'
+  );
+};
+
 var hasNodeModule = function (node) {
   return (
     node.type === 'AssignmentExpression' &&
@@ -116,7 +132,10 @@ var examineCode = function (code) {
     hasResolve: false,
     hasReject: false,
     hasAll: false,
+    hasInlineAll: false,
     hasRace: false,
+    hasInlineRace: false,
+    hasAllRace: false,
     hasNodeModule: false
   };
   if (hasTopLevelFunction(ast)) {
@@ -154,10 +173,19 @@ var examineCode = function (code) {
       report.hasReject = true;
     }
     if (hasAll(node)) {
+      if (hasInlineAll(node)) {
+        report.hasInlineAll = true;
+      }
       report.hasAll = true;
     }
     if (hasRace(node)) {
+      if (hasInlineRace(node)) {
+        report.hasInlineRace = true;
+      }
       report.hasRace = true;
+    }
+    if (hasAllRace(node)) {
+      report.hasAllRace = true;
     }
     if (hasNodeModule(node)) {
       report.hasNodeModule = true;
@@ -233,6 +261,43 @@ describe('build', function () {
       reject: true
     })), {
       hasReject: true
+    });
+  });
+
+  it('should enable all', function () {
+    assertReport(examineCode(build({
+      all: true
+    })), {
+      hasResolveReference: true,
+      hasExposedResolve: false,
+      hasAllRace: false,
+      hasInlineAll: true
+    });
+  });
+
+  it('should enable race', function () {
+    assertReport(examineCode(build({
+      race: true
+    })), {
+      hasResolveReference: true,
+      hasExposedResolve: false,
+      hasAllRace: false,
+      hasInlineRace: true
+    });
+  });
+
+  it('should enable all and race', function () {
+    assertReport(examineCode(build({
+      all: true,
+      race: true
+    })), {
+      hasResolveReference: true,
+      hasExposedResolve: false,
+      hasAllRace: true,
+      hasAll: true,
+      hasInlineAll: false,
+      hasRace: true,
+      hasInlineRace: false
     });
   });
 
