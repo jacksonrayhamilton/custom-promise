@@ -54,9 +54,9 @@ var build = function (options) {
 
   var node = Boolean(options.node);
 
+  // Also wrap IE because it has named function expression bugs.
   var wrap =
-      ((includeResolve || includeReject || includeAll || includeRace) && !node) ||
-      ie; // IE has named function expression bugs.
+      (includeResolve || includeReject || includeAll || includeRace || ie) && !node;
 
   // Use a named function expression to maintain a reference to `p` regardless
   // of global variable tampering.
