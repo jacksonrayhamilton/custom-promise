@@ -6,6 +6,13 @@ var esprima = require('esprima');
 var get = require('lodash/get');
 var walk = require('esprima-walk');
 
+var hasIife = function (ast) {
+  return (
+    get(ast, 'body[0].type') === 'VariableDeclaration' &&
+      get(ast, 'body[0].declarations[0].init.type') === 'CallExpression'
+  );
+};
+
 var hasTopLevelFunction = function (ast) {
   return (
     get(ast, 'body[0].type') === 'VariableDeclaration' &&
@@ -121,6 +128,7 @@ var hasNodeModule = function (node) {
 var examineCode = function (code) {
   var ast = esprima.parse(code);
   var report = {
+    hasIife: false,
     hasTopLevelFunction: false,
     hasNamedFunctionExpression: false,
     hasInlineThen: false,
@@ -138,6 +146,9 @@ var examineCode = function (code) {
     hasAllRace: false,
     hasNodeModule: false
   };
+  if (hasIife(ast)) {
+    report.hasIife = true;
+  }
   if (hasTopLevelFunction(ast)) {
     report.hasTopLevelFunction = true;
   }
@@ -212,6 +223,7 @@ describe('build', function () {
 
   it('should generate a minimal build', function () {
     assertReport(examineCode(build()), {
+      hasIife: false,
       hasTopLevelFunction: true,
       hasNamedFunctionExpression: true,
       taskFunction: 'setTimeout',
@@ -309,6 +321,30 @@ describe('build', function () {
       hasNamedFunctionExpression: false,
       hasNodeModule: true
     });
+  });
+
+  it('should wrap p in an iife pessimistically', function () {
+    var expected = {
+      hasIife: true,
+      hasNamedFunctionExpression: false
+    };
+    assertReport(examineCode(build({ie: true})), expected);
+    assertReport(examineCode(build({resolve: true})), expected);
+    assertReport(examineCode(build({reject: true})), expected);
+    assertReport(examineCode(build({all: true})), expected);
+    assertReport(examineCode(build({race: true})), expected);
+  });
+
+  it('should not wrap p in an iife in modules', function () {
+    var expected = {
+      hasIife: false,
+      hasNamedFunctionExpression: false
+    };
+    assertReport(examineCode(build({node: true, ie: true})), expected);
+    assertReport(examineCode(build({node: true, resolve: true})), expected);
+    assertReport(examineCode(build({node: true, reject: true})), expected);
+    assertReport(examineCode(build({node: true, all: true})), expected);
+    assertReport(examineCode(build({node: true, race: true})), expected);
   });
 
 });
