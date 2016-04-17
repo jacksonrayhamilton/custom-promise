@@ -3,4 +3,5 @@ language: node_js
 node_js:
   - "5"
   - "4"
-script: node_modules/.bin/grunt test
+before_install: npm install --global grunt-cli
+script: grunt test
