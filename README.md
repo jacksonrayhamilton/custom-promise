@@ -1,4 +1,4 @@
-# p.js
+# p.js [![Build Status](https://travis-ci.org/jacksonrayhamilton/p.js.svg?branch=master)](https://travis-ci.org/jacksonrayhamilton/p.js)
 
 A small, useful and secure A+ promise library.
 
