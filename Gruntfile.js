@@ -201,8 +201,7 @@ module.exports = function (grunt) {
           '*.js',
           'customizer/**.js',
           'test/**.js',
-          'modules/**.js',
-          '!modules/**.min.js'
+          'modules/**.js'
         ]
       }
     },
