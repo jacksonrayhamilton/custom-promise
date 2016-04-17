@@ -1,20 +1,16 @@
-# p.js [![Build Status](https://travis-ci.org/jacksonrayhamilton/p.js.svg?branch=master)](https://travis-ci.org/jacksonrayhamilton/p.js)
+# custom-promise [![Build Status](https://travis-ci.org/jacksonrayhamilton/custom-promise.svg?branch=master)](https://travis-ci.org/jacksonrayhamilton/custom-promise)
 
-A small, useful and secure A+ promise library.
+A small, useful, secure and customizable A+ promise library.
 
-- Small: About 500 bytes minified and gzipped.  About 300 bytes when built only
-  for A+ compliance.
+- Small: About 500 bytes minified and gzipped with all features.  About 300
+  bytes when built only for A+ compliance.
 - Useful: `catch`, `resolve`, `reject`, `all`, `race`, old IE support.
 - Secure: No private state exposed.
-
-## Customize
-
-You can build your own version of p.js with only the methods and environment
-support that you want.  Take the [p.js Customizer][] for a spin!
-
-[p.js Customizer]: http://jacksonrayhamilton.github.io/p.js/
+- Customizable: Include only what you need with the [Customizer][]!
 
 ## API
+
+Access the custom-promise API through the exported function `p` its methods.
 
 ### `p(executor)`
 
@@ -135,10 +131,12 @@ good candidate for inclusion within other libraries.
 
 This library is not concerned with competitive performance (minimizing task
 delay, CPU cycles and memory), as that could cost bytes and compromise security.
-(However, you *can* customize the task function in a custom build.)  Other
+(However, you *can* customize the task function with the [Customizer][].)  Other
 promise libraries may be better suited for especially stressful scenarios.
 
 This library does not provide a polyfill for the `Promise` constructor or its
 methods.  However, being A+-compliant, the promises are interoperable.  Also,
-`Promise` and `p` have approximately the same interface, so p.js could
-reasonably substitute for `Promise` until it becomes ubiquitous.
+`Promise` and `p` have approximately the same interface, so this implementation
+could reasonably substitute for `Promise` until it becomes ubiquitous.
+
+[Customizer]: http://jacksonrayhamilton.github.io/custom-promise/
