@@ -10,12 +10,12 @@ A small, useful, secure and customizable A+ promise library.
 
 ## API
 
-Access the custom-promise API through the exported function `p` its methods.
+Access the custom-promise API through the exported function `p` and its methods.
 
 ### `p(executor)`
 
-Create a promise. `executor` is a function immediately executed with `resolve`
-and `reject` functions as parameters, which fulfill or reject the promise.
+Create a promise.  The function `executor` is immediately called with `resolve`
+and `reject` functions as arguments, which fulfill or reject the promise.
 
 ### `promise.then(onFulfilled, onRejected)`
 
@@ -24,13 +24,13 @@ cannot be fulfilled.
 
 ### `promise.catch(onRejected)`
 
-Shortcut method for registering just a rejection callback.
+Register just a rejection callback.
 
 ### `p.resolve(value)`
 
 Create a promise fulfilled with `value`.  If `value` has a `then` method, it is
-assumed to be a promise, and this function returns a promise inheriting the
-state of `value`.
+assumed to be a promise, and a new promise is returned inheriting the state of
+`value`.
 
 ### `p.reject(reason)`
 
@@ -51,8 +51,7 @@ Create a promise resolving with the first value to resolve in `collection` via
 
 ## Examples
 
-You can use `p.resolve` to create a promise and `then` to handle its
-fulfillment:
+Use `p.resolve` to create a promise and `then` to handle its fulfillment:
 
 ```js
 p.resolve('Hello World!').then(function (value) {
@@ -60,9 +59,8 @@ p.resolve('Hello World!').then(function (value) {
 });
 ```
 
-You can use `p()` to manage promises.  Here, a promise is created, it is
-randomly fulfilled or rejected, and fulfillment and rejection handlers are
-registered on the promise:
+Manage promises with `p()`.  Here, a promise is created, then randomly fulfilled
+or rejected, and fulfillment and rejection callbacks handle the outcome:
 
 ```js
 p(function (resolve, reject) {
@@ -80,8 +78,8 @@ p(function (resolve, reject) {
 });
 ```
 
-Most of the time, you probably won't need to manage promises, so you should
-prefer `p.resolve` and `p.reject` for creating promises.
+Managing promises is often avoidable.  Prefer using promises returned by other
+APIs, or use `p.resolve` and `p.reject` to create promises.
 
 You can use `p.all` to await the completion of multiple promises:
 
