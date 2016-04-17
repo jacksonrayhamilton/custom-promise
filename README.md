@@ -2,11 +2,11 @@
 
 A small, useful, secure and customizable A+ promise library.
 
-- Small: About 500 bytes minified and gzipped with all features.  About 300
-  bytes when built only for A+ compliance.
+- Small: About 500 bytes minified and gzipped.  About 300 bytes when built only
+  for A+ compliance.
 - Useful: `catch`, `resolve`, `reject`, `all`, `race`, old IE support.
 - Secure: No private state exposed.
-- Customizable: Include only what you need with the [Customizer][]!
+- Customizable: Include only necessary functionality with the [Customizer][]!
 
 ## Usage
 
@@ -16,18 +16,20 @@ Include the fully-featured library with `npm`:
 npm install custom-promise
 ```
 
-Then load it via `require` or `<script>`:
+In Node, load it via `require`:
 
 ```js
 var p = require('custom-promise');
 ```
 
+In browsers, load it via `<script>`:
+
 ```html
 <script src="node_modules/custom-promise/modules/p.script.js"></script>
 ```
 
-Alternatively, you can create a custom build with the [Customizer][] or
-`tools/build.js`, and include the output where you see fit.
+Alternatively, create a custom build with the [Customizer][] or
+`tools/build.js`.
 
 ## Promise API
 
@@ -35,40 +37,44 @@ Access the promise API through the exported function `p` and its methods.
 
 ### `p(executor)`
 
-Create a promise.  The function `executor` is immediately called with `resolve`
-and `reject` functions as arguments, which fulfill or reject the promise.
+Returns a promise.  The function `executor` is immediately called with `resolve`
+and `reject` functions as arguments.  Call `resolve` with one argument to
+fulfill the promise with that value.  Call `reject` with one argument to reject
+the promise with that reason.
 
 ### `promise.then(onFulfilled, onRejected)`
 
-Register callbacks to receive a promise's eventual value or the reason why it
-cannot be fulfilled.
+Registers callbacks to receive a promise's eventual value or the reason why it
+cannot be fulfilled, and returns a promise resolving with the return value of
+these callbacks.
 
 ### `promise.catch(onRejected)`
 
-Register just a rejection callback.
+Registers just a rejection callback, and returns a promise resolving with the
+return value of this callback.
 
 ### `p.resolve(value)`
 
-Create a promise fulfilled with `value`.  If `value` has a `then` method, it is
-assumed to be a promise, and a new promise is returned inheriting the state of
-`value`.
+Returns a promise fulfilled with `value`.  If `value` has a `then` method, it is
+assumed to be a promise, and the returned promise inherits the state of `value`.
 
 ### `p.reject(reason)`
 
-Create a promise rejected with `reason`.
+Returns a promise rejected with `reason`.
 
 ### `p.all(collection)`
 
-Create a promise resolving the values in `collection`.  If `collection` is
-array-like (has a `length` property), the promise is resolved with an array,
-else with an object.  Each value in `collection` must be fulfilled by
-`p.resolve` before the promise is fulfilled.  If any value in `collection` is
-rejected, the promise is rejected.
+Returns a promise resolving the values in `collection`.  If `collection` is
+array-like (has a `length` property), the promise is fulfilled with an array,
+otherwise it is fulfilled with an object.  Each value in `collection` must be
+fulfilled (internally) by `p.resolve` before the returned promise is fulfilled.
+If any value in `collection` is rejected, the returned promise is rejected.
 
 ### `p.race(collection)`
 
-Create a promise resolving with the first value to resolve in `collection` via
-`p.resolve`.  If any value in `collection` is rejected, the promise is rejected.
+Returns a promise resolving with the first value to resolve in `collection` via
+`p.resolve` (internally).  If any value in `collection` is rejected, the
+returned promise is rejected.
 
 ### Examples
 
@@ -102,7 +108,7 @@ p(function (resolve, reject) {
 Managing promises is often avoidable.  Prefer using promises returned by other
 APIs, or use `p.resolve` and `p.reject` to create promises.
 
-You can use `p.all` to await the completion of multiple promises:
+Use `p.all` to await the completion of multiple promises:
 
 ```js
 p.all([
@@ -117,7 +123,7 @@ p.all([
 });
 ```
 
-When order is unimportant, you can pass an object to `p.all` instead:
+When order is unimportant, pass an object to `p.all` instead:
 
 ```js
 p.all({
@@ -129,8 +135,8 @@ p.all({
 });
 ```
 
-When only the value of one promise in a set of promises matters, you can use
-`p.race` with an [array-like] object:
+When only the value of one promise in a set of promises matters, use `p.race`
+with an [array-like] object:
 
 ```js
 p.race([
@@ -147,14 +153,14 @@ Programmatically make custom builds with `tools/build.js`.
 
 ### build(options)
 
-Return a customized implementation of `p` as a string.  The following options
+Returns a customized implementation of `p` as a string.  The following options
 are available:
 
 - `catch`: Provide the `catch` method on promises.
 - `resolve`, `reject`, `all`, `race`: Provide these methods on `p`.
-- `task`: Customize the task function.  The default is `setTimeout`.  You may
-  opt to use faster alternatives like `setImmediate` or `process.nextTick` if
-  they are available.
+- `task`: Customize the task function.  The default is `setTimeout`.
+  Alternatives like `setImmediate` or `process.nextTick` may be used if they
+  will be available globally in target environments.
 - `ie`: Workaround old IE bugs.
 - `node`: Export a Node.js module.
 
@@ -187,6 +193,6 @@ promise libraries may be better suited for especially stressful scenarios.
 This library does not provide a polyfill for the `Promise` constructor or its
 methods.  However, being A+-compliant, the promises are interoperable.  Also,
 `Promise` and `p` have approximately the same interface, so this implementation
-could reasonably substitute for `Promise` until it becomes ubiquitous.
+could reasonably substitute for `Promise`.
 
 [Customizer]: http://jacksonrayhamilton.github.io/custom-promise/
