@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "license": "MIT",
   "files": [
-    "build/module"
+    "modules"
   ],
-  "main": "build/module/p.node.js",
+  "main": "modules/p.node.js",
   "repository": "jacksonrayhamilton/custom-promise",
   "scripts": {
     "prepublish": "grunt module"

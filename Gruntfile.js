@@ -17,7 +17,7 @@ module.exports = function (grunt) {
 
   merge(config, {
     clean: {
-      module: ['build/module/**']
+      module: ['modules/**']
     },
     watch: {
       module: {
@@ -29,7 +29,7 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('template:module', function () {
-    grunt.file.write('build/module/p.script.js', build({
+    grunt.file.write('modules/p.script.js', build({
       catch: true,
       resolve: true,
       reject: true,
@@ -37,7 +37,7 @@ module.exports = function (grunt) {
       race: true,
       ie: true
     }));
-    grunt.file.write('build/module/p.node.js', build({
+    grunt.file.write('modules/p.node.js', build({
       catch: true,
       resolve: true,
       reject: true,
@@ -56,8 +56,8 @@ module.exports = function (grunt) {
   // Customizer / Web
 
   var browserifyFiles = {
-    'build/customizer/bundle.js': 'customizer/main.js',
-    'build/customizer/builder-worker.js': 'customizer/builder-worker.js'
+    'web/bundle.js': 'customizer/main.js',
+    'web/builder-worker.js': 'customizer/builder-worker.js'
   };
 
   merge(config, {
@@ -79,17 +79,17 @@ module.exports = function (grunt) {
       }
     },
     clean: {
-      customizer: ['build/customizer/**'],
+      customizer: ['web/**'],
       postWeb: [
-        'build/customizer/bundle.js',
-        'build/customizer/node_modules/**'
+        'web/bundle.js',
+        'web/node_modules/**'
       ]
     },
     connect: {
       customizer: {
         options: {
           port: 1024,
-          base: ['build/customizer/'],
+          base: ['web/'],
           middleware: function (connect, unused, middlewares) {
             middlewares.unshift(
               // Provide the middleware ourselves so the hostname will be dynamic.
@@ -115,7 +115,7 @@ module.exports = function (grunt) {
           removeOptionalTags: true
         },
         files: {
-          'build/customizer/index.html': 'build/customizer/index.html'
+          'web/index.html': 'web/index.html'
         }
       }
     },
@@ -125,31 +125,31 @@ module.exports = function (grunt) {
           expand: true,
           cwd: 'customizer/',
           src: ['**', '!*.js'],
-          dest: 'build/customizer/'
+          dest: 'web/'
         }, {
           expand: true,
           src: ['node_modules/bootstrap/dist/**'],
-          dest: 'build/customizer/'
+          dest: 'web/'
         }]
       }
     },
     uglify: {
       customizer: {
-        src: 'build/customizer/builder-worker.js',
-        dest: 'build/customizer/builder-worker.js'
+        src: 'web/builder-worker.js',
+        dest: 'web/builder-worker.js'
       }
     },
     usemin: {
       options: {
-        assetsDirs: ['build/customizer/']
+        assetsDirs: ['web/']
       },
-      html: 'build/customizer/index.html'
+      html: 'web/index.html'
     },
     useminPrepare: {
       options: {
-        dest: 'build/customizer/'
+        dest: 'web/'
       },
-      html: 'build/customizer/index.html'
+      html: 'web/index.html'
     },
     watch: {
       customizerSync: {
@@ -158,7 +158,7 @@ module.exports = function (grunt) {
         tasks: ['sync:customizer']
       },
       customizerBuild: {
-        files: ['build/customizer/**/*'],
+        files: ['web/**/*'],
         options: {
           livereload: 1025
         }
@@ -201,8 +201,8 @@ module.exports = function (grunt) {
           '*.js',
           'customizer/**.js',
           'test/**.js',
-          'build/module/**.js',
-          '!build/module/**.min.js'
+          'modules/**.js',
+          '!modules/**.min.js'
         ]
       }
     },
@@ -227,7 +227,7 @@ module.exports = function (grunt) {
   grunt.registerTask('tdd', function () {
     grunt.config('watch', {
       tdd: {
-        files: ['build/module/**.js', 'test/**.js'],
+        files: ['modules/**.js', 'test/**.js'],
         tasks: ['eslint', 'mochaTest'],
         options: {
           spawn: false

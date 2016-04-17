@@ -1,4 +1,5 @@
 *.log
 .tmp
-build
+modules
 node_modules
+web
