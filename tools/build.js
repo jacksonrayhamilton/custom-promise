@@ -4,10 +4,12 @@
 'use strict';
 
 var fs = require('fs');
+var path = require('path');
 var template = require('lodash/template');
-var pTemplate = template(fs.readFileSync('templates/p', 'utf8'));
-var thenTemplate = template(fs.readFileSync('templates/then', 'utf8'));
-var allRaceTemplate = template(fs.readFileSync('templates/allRace', 'utf8'));
+
+var pTemplate = template(fs.readFileSync(path.resolve(__dirname, '../templates/p'), 'utf8'));
+var thenTemplate = template(fs.readFileSync(path.resolve(__dirname, '../templates/then'), 'utf8'));
+var allRaceTemplate = template(fs.readFileSync(path.resolve(__dirname, '../templates/allRace'), 'utf8'));
 
 var getIndentation = function (level) {
   var indentation = '';
