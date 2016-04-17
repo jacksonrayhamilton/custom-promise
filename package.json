@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "files": [
-    "modules"
+    "modules",
+    "tools"
   ],
   "main": "modules/p.node.js",
   "repository": "jacksonrayhamilton/custom-promise",
