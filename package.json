@@ -8,7 +8,7 @@
   "main": "modules/p.node.js",
   "repository": "jacksonrayhamilton/custom-promise",
   "scripts": {
-    "prepublish": "grunt module"
+    "prepublish": "grunt modules"
   },
   "devDependencies": {
     "bootstrap": "^3.3.6",

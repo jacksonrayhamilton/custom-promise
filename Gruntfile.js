@@ -13,22 +13,22 @@ module.exports = function (grunt) {
 
   var config = {};
 
-  // Module
+  // Modules
 
   merge(config, {
     clean: {
-      module: ['modules/**']
+      modules: ['modules/**']
     },
     watch: {
-      module: {
+      modules: {
         // Have to use `**/*` due to issue #481.
         files: ['templates/**/*'],
-        tasks: ['module']
+        tasks: ['modules']
       }
     }
   });
 
-  grunt.registerTask('template:module', function () {
+  grunt.registerTask('template:modules', function () {
     grunt.file.write('modules/p.script.js', build({
       catch: true,
       resolve: true,
@@ -48,9 +48,9 @@ module.exports = function (grunt) {
     }));
   });
 
-  grunt.registerTask('module', [
-    'clean:module',
-    'template:module'
+  grunt.registerTask('modules', [
+    'clean:modules',
+    'template:modules'
   ]);
 
   // Customizer / Web
@@ -215,12 +215,12 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('test', ['module', 'eslint', 'mochaTest']);
+  grunt.registerTask('test', ['modules', 'eslint', 'mochaTest']);
 
   // Development
 
-  // Build the module and the customizer continuously.
-  grunt.registerTask('serve', ['module', 'customizer:serve', 'watch']);
+  // Build the modules and the customizer continuously.
+  grunt.registerTask('serve', ['modules', 'customizer:serve', 'watch']);
 
   // In tandem with `grunt serve`, run tests continuously.
   grunt.registerTask('tdd', function () {
