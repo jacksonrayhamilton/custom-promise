@@ -8,9 +8,30 @@ A small, useful, secure and customizable A+ promise library.
 - Secure: No private state exposed.
 - Customizable: Include only what you need with the [Customizer][]!
 
-## API
+## Usage
 
-Access the custom-promise API through the exported function `p` and its methods.
+Include the fully-featured library with `npm`:
+
+```sh
+npm install custom-promise
+```
+
+Then load it via `require` or `<script>`:
+
+```js
+var p = require('custom-promise');
+```
+
+```html
+<script src="node_modules/custom-promise/modules/p.script.js"></script>
+```
+
+Alternatively, you can create a custom build with the [Customizer][] or
+`tools/build.js`, and include the output where you see fit.
+
+## Promise API
+
+Access the promise API through the exported function `p` and its methods.
 
 ### `p(executor)`
 
@@ -49,7 +70,7 @@ rejected, the promise is rejected.
 Create a promise resolving with the first value to resolve in `collection` via
 `p.resolve`.  If any value in `collection` is rejected, the promise is rejected.
 
-## Examples
+### Examples
 
 Use `p.resolve` to create a promise and `then` to handle its fulfillment:
 
@@ -118,6 +139,37 @@ p.race([
 ]).then(function (result) {
   console.log('Did ' + result + ' as it was faster');
 });
+```
+
+## Custom Build API
+
+Programmatically make custom builds with `tools/build.js`.
+
+### build(options)
+
+Return a customized implementation of `p` as a string.  The following options
+are available:
+
+- `catch`: Provide the `catch` method on promises.
+- `resolve`, `reject`, `all`, `race`: Provide these methods on `p`.
+- `task`: Customize the task function.  The default is `setTimeout`.  You may
+  opt to use faster alternatives like `setImmediate` or `process.nextTick` if
+  they are available.
+- `ie`: Workaround old IE bugs.
+- `node`: Export a Node.js module.
+
+### Examples
+
+Create a custom build with `catch` and `ie` support, and save it to
+`build/p.custom.js`:
+
+```js
+var fs = require('fs');
+var build = require('custom-promise/tools/build');
+fs.writeFileSync('build/p.custom.js', build({
+  catch: true,
+  ie: true
+}));
 ```
 
 ## Use cases
