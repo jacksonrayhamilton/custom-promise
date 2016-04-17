@@ -4,12 +4,16 @@
   "license": "MIT",
   "files": [
     "modules",
+    "templates",
     "tools"
   ],
   "main": "modules/p.node.js",
   "repository": "jacksonrayhamilton/custom-promise",
   "scripts": {
     "prepublish": "grunt modules"
+  },
+  "dependencies": {
+    "lodash": "^4.11.1"
   },
   "devDependencies": {
     "bootstrap": "^3.3.6",
@@ -31,7 +35,6 @@
     "grunt-sync": "^0.5.2",
     "grunt-usemin": "^3.1.1",
     "load-grunt-tasks": "^3.4.0",
-    "lodash": "^4.11.1",
     "mocha": "^2.3.4",
     "promises-aplus-tests": "^2.1.1",
     "tiny-emitter": "^1.0.2",

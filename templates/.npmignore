@@ -1,0 +1,4 @@
+# The package.json "files" array trumps unless .npmignore is placed in the
+# same directory as the ignored file: https://github.com/npm/npm/issues/4479
+.editorconfig
+.npmignore
