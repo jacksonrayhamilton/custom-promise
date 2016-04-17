@@ -29,6 +29,14 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('template:module', function () {
+    grunt.file.write('build/module/p.script.js', build({
+      catch: true,
+      resolve: true,
+      reject: true,
+      all: true,
+      race: true,
+      ie: true
+    }));
     grunt.file.write('build/module/p.node.js', build({
       catch: true,
       resolve: true,
